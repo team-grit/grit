@@ -1,0 +1,314 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="initial-scale=1">
+
+		<title>grit</title>
+
+		<link rel="stylesheet" href="css/jquery-ui.min.css" />
+		<link rel="stylesheet" href="css/jquery.datetimepicker.css" />
+
+		<link rel="stylesheet" href="css/main.css" />
+
+		<script src="js/jquery-2.1.1.min.js"></script>
+		<script src="js/jquery-ui.min.js"></script>
+		<script src="js/jquery.datetimepicker.js"></script>
+		<script src="js/init.js"></script>
+	</head>
+	<body>
+		<div id="content">
+			<div id="content-header">
+				<a href="home" class="home-button"><img id="grit-logo" src="img/grit_h64.png"></a>
+				<h1 id="grit-heading">grade it!</h1>
+				<a href="home" class="home-button"><img id="grit-icon" src="img/tool_icon.png"></a>
+			</div>
+
+			<div id="content-body-wrapper">
+				<div id="overlay-loading" class="overlay">
+					<h2>Loading...</h2>
+				</div>
+				<div id="overlay-reboot" class="overlay">
+					<h2>Trying to reboot...</h2>
+				</div>
+				<div id="content-body">
+
+					<nav>
+						<div id="breadcrumb"></div>
+						<a href="back" class="icon-button back-button"><img src="img/32/back.png"></a>
+						<a href="refresh" class="icon-button refresh-button"><img src="img/32/refresh.png"></a>
+						<a href="settings" class="icon-button settings-button"><img src="img/32/gear.png"></a>
+						<a href="xml" class="icon-button xml-button"><img src="img/32/xml.png"></a>
+						<a href="help" class="icon-button help-button"><img src="img/32/help.png"></a>
+					</nav>
+
+					<div id="course-list">
+						<div id="courses">
+
+						</div>
+						<a class="icon-button" href="course-new" id="course-new-button"><img src="img/folder_add.png"></a>
+					</div> <!-- END course-list -->
+
+					<div id="course-new">
+						<form>
+							<table class="input-table" rules="rows">
+								<tr>
+									<td>course name:</td>
+									<td><input type="text" id="course-new-courseName" class="input-field" name="courseName"></td>
+								</tr>
+							</table>
+							<input type="submit" class="knopf" value="Create course">
+						</form>
+					</div> <!-- END course-new -->
+
+					<div id="course-show">
+
+						<h3 id="course-show-courseName"></h3>
+						
+						<div id="exercise-list">
+							<table>
+								<tr>
+									<th>exercise name</th>
+									<th>start</th>		
+									<th>deadline</th>
+									<th>status</th>
+									<th></th>
+								</tr>
+							</table>
+							<a class="icon-button" href="exercise-new" id="exercise-new-button"><img src="img/add.png" height="32px"></a>
+						</div> <!-- END exercise-list -->
+
+						<div id="exercise-new">
+							<form enctype="multipart/form-data">
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>exercise name:</td>
+										<td><input type="text" class="input-field" id="exercise-new-exerciseName" name="exerciseName"></td>
+									</tr>
+									<tr>
+										<td>language:</td>
+										<td><select id="exercise-new-languageType" class="input-field" name="languageType"></select></td>
+									</tr>
+									<tr>
+										<td>start at:</td>
+										<td><input type="text" class="input-field datetime" id="exercise-new-start" name="start"></td>
+									</tr>
+									<tr>
+										<td>deadline:</td>
+										<td><input type="text" class="input-field datetime" id="exercise-new-deadline" name="deadline"></td>
+									</tr>
+									<tr>
+										<td>fetching period:</td>
+										<td><input type="text" class="input-field timeperiod" id="exercise-new-period" name="period"></td>
+									</tr>
+									<tr>
+										<td>connection to use:</td>
+										<td><select id="exercise-new-connectionId" class="input-field" name="connectionId"></select></td>
+									</tr>
+									<tr>
+										<td>unit test file:</td>
+										<td><input type="file" id="exercise-new-testfile" class="input-field" name="testfile"></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input type="submit" class="knopf" value="Create exercise">
+							</form>
+						</div> <!-- END exercise-new -->
+
+						<div id="no-connection-error">
+							<h2>No connections available</h2>
+							You have to create a connection first. Click on the gear symbol in the upper right corner, to go to the settings view.
+						</div> <!-- END exercise-new-connection-error -->
+
+						<div id="exercise-edit">
+							<form enctype="multipart/form-data">
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>exercise name:</td>
+										<td><input type="text" class="input-field" id="exercise-edit-exerciseName" name="exerciseName"></td>
+									</tr>
+									<tr>
+										<td>language:</td>
+										<td><select id="exercise-edit-languageType" class="input-field" name="languageType"></select></td>
+									</tr>
+									<tr>
+										<td>start at:</td>
+										<td><input type="text" class="input-field datetime" id="exercise-edit-start" name="start"></td>
+									</tr>
+									<tr>
+										<td>deadline:</td>
+										<td><input type="text" class="input-field datetime" id="exercise-edit-deadline" name="deadline"></td>
+									</tr>
+									<tr>
+										<td>fetching period:</td>
+										<td><input type="text" class="input-field timeperiod" id="exercise-edit-period" name="period"></td>
+									</tr>
+									<tr>
+										<td>connection to use:</td>
+										<td><select id="exercise-edit-connectionId" class="input-field" name="connectionId"></select></td>
+									</tr>
+									<tr>
+										<td>unit test file:</td>
+										<td><input type="file" id="exercise-edit-testfile" class="input-field" name="testfile"></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input type="submit" class="knopf" value="Update exercise">
+							</form>
+						</div> <!-- END exercise-edit -->
+
+					</div> <!-- END course-show -->
+
+					<div id="course-edit">
+						<form>
+							<table class="input-table" rules="rows">
+								<tr>
+									<td>course name:</td>
+									<td><input type="text" id="course-edit-courseName" class="input-field" name="courseName"></td>
+								</tr>
+							</table>
+							<input type="submit" class="knopf" value="Update course">
+						</form>
+					</div> <!-- END course-edit -->
+
+					<div id="settings">
+
+						<div id="connection-list">
+							<table>
+								<tr>
+									<th>connection name</th>
+									<th>type</th>
+									<th>location</th>
+									<th>username</th>
+									<th>SSH username</th>
+									<th></th>
+								</tr>
+							</table>
+							<a class="icon-button" href="connection-new" id="connection-new-button"><img src="img/add.png" height="32px"></a>
+						</div> <!-- END connection-list -->
+
+						<div id="connection-new">
+							<form enctype="multipart/form-data">
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>connection name:</td>
+										<td><input type="text" class="input-field" id="connection-new-connectionName" name="connectionName"></td>
+									</tr>
+									<tr>
+										<td>connection type:</td>
+										<td><select class="input-field" id="connection-new-connectionType" name="connectionType"></select></td>
+									</tr>
+									<tr>
+										<td>location:</td>
+										<td><input type="text" class="input-field" id="connection-new-location" name="location"></td>
+									</tr>
+									<tr>
+										<td>username:</td>
+										<td><input type="text" class="input-field" id="connection-new-username" name="username"></td>
+									</tr>
+									<tr>
+										<td>password:</td>
+										<td><input type="password" class="input-field" id="connection-new-password" name="password"></td>
+									</tr>
+									<tr>
+										<td>ssh username:</td>
+										<td><input type="text" class="input-field" id="connection-new-sshUsername" name="sshUsername"></td>
+									</tr>
+									<tr>
+										<td>ssh key-file:</td>
+										<td><input type="file" id="connection-new-sshKeyFile" name="sshKeyFile"></td>
+									</tr>
+									<tr>
+										<td>structure:</td>
+										<td><textarea class="input-field" id="connection-new-structure" name="structure"></textarea></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input class="knopf" type="submit" value="Create connection">
+							</form>
+						</div> <!-- END connection-new -->
+
+						<div id="connection-edit">
+							<form enctype="multipart/form-data">
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>connection name:</td>
+										<td><input type="text" class="input-field" id="connection-edit-connectionName" name="connectionName"></td>
+									</tr>
+									<tr>
+										<td>connection type:</td>
+										<td><select class="input-field" id="connection-edit-connectionType" name="connectionType"></select></td>
+									</tr>
+									<tr>
+										<td>location:</td>
+										<td><input type="text" class="input-field" id="connection-edit-location" name="location"></td>
+									</tr>
+									<tr>
+										<td>username:</td>
+										<td><input type="text" class="input-field" id="connection-edit-username" name="username"></td>
+									</tr>
+									<tr>
+										<td>password:</td>
+										<td><input type="password" class="input-field" id="connection-edit-password" name="password"></td>
+									</tr>
+									<tr>
+										<td>ssh username:</td>
+										<td><input type="text" class="input-field" id="connection-edit-sshUsername" name="sshUsername"></td>
+									</tr>
+									<tr>
+										<td>ssh key-file:</td>
+										<td><input type="file" id="connection-edit-sshKeyFile" name="sshKeyFile"></td>
+									</tr>
+									<tr>
+										<td>structure:</td>
+										<td><textarea class="input-field" id="connection-edit-structure" name="structure"></textarea></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input class="knopf" type="submit" value="Update connection">
+							</form>
+						</div> <!-- END connection-edit -->
+
+					</div> <!-- END settings -->
+
+					<div id="xml">
+
+						<div id="xml-config">
+							<form>
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>config:</td>
+										<td><textarea class="input-field" id="xml-config-field" name="configXml"></textarea></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input class="knopf" type="submit" value="Update config">
+							</form>
+						</div> <!-- END xml-config -->
+
+						<div id="xml-state">
+							<form>
+								<table class="input-table" rules="rows">
+									<tr>
+										<td>state:</td>
+										<td><textarea class="input-field" id="xml-state-field" name="stateXml"></textarea></td>
+									</tr>
+									<tr>
+									</tr>
+								</table>
+								<input class="knopf" type="submit" value="Update state">
+							</form>
+						</div> <!-- END xml-state -->
+
+					</div> <!-- END xml -->
+
+				</div> <!-- END content-body -->
+			</div>
+		</div> <!--  END content -->
+	</body>
+</html>

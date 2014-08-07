@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config>
+<server>
+	<port value="8080"/>
+</server>
+<email>
+	<auth password="Modell83-Zivilgerichte" adress="pcssdev@gmail.com" host="smtp.gmail.com"/>	
+</email>
+<admin>
+	<user name="username" email="david.kolb@uni-konstanz.de" password="password"/>
+</admin>
+</config>

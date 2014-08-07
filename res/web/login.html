@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="initial-scale=1">
+
+		<title>PCSS</title>
+
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+
+		<link rel="stylesheet" href="css/login.css" />
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	</head>
+	<body>
+		<div id="content">
+			<div id="content-header">
+				<h2 id="heading" >PCSS Login</h2>
+				<img style="margin-left:865px;margin-top:10px;position:absolute" src="img/tool_icon.png" height="45px">
+			</div>
+			
+			<div id="content-body">
+			
+				<div id="text_box">	
+					<p>Please enter your login information:</p>
+				</div>
+				
+				<div id="input_name" class="input">	
+					<p>username:</p>
+					<input type="text" name="username" size="50px" value="">
+				</div>
+				
+				<div id="input_pw" class="input">
+					<p>password:</p>
+					<form action="">
+						<input type="password" name="password" size="50px" value="">
+							</br></br></br>
+						<input type="submit" value="Quit" style="width:100px">
+						<input type="submit" value="Login" style="width:100px">
+					</form>
+				</div>
+				
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var processing = false;
+			$("#process").click(function(){
+				if (!processing) {
+					processing = true;
+					$("#download").prop('disabled', true);
+					$("#status").html("Processing...");
+					$.get("process", function(data,status){
+						//alert("Data: " + data + "\nStatus: " + status);
+						processing = false;
+						$("#status").html("Submissions ready for download.");
+						$("#download").prop('disabled', false);
+					});
+				}
+			});
+			$("#download").click(function(){
+				window.open("STUDENT0.report.tex");
+			});
+		</script>
+	</body>
+</html>

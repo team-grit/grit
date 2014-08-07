@@ -1,0 +1,321 @@
+@viewport{
+	width: extend-to-zoom;
+	zoom: 1.0;
+}
+
+@-ms-viewport{
+	width: extend-to-zoom;
+	zoom: 1.0;
+}
+
+* {
+	margin: 0px;
+	padding: 0px;
+
+	z-index: 10;
+}
+
+h1 {
+	font-size: 32px;
+	font-weight: normal;
+}
+
+h2 {
+	font-size: 24px;
+	font-weight: normal;
+}
+
+h3 {
+	font-size: 20px;
+	font-weight: normal;
+}
+
+h4 {
+	font-size: 16px;
+	font-weight: normal;
+}
+
+a {
+	text-decoration: none;
+	color: #0f75bc;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+
+	font-family: Helvetica, Arial, Verdana, sans-serif;
+	font-size: 14px;
+}
+
+#content {
+	width: 800px;
+	/*height: 670px;*/
+
+	margin: 20px auto;
+
+	color: #333333;
+}
+
+#content-header {
+	width: 738px;
+	height: 64px;
+
+	padding: 12px 30px;
+
+	border: 1px solid #A7A7A7;
+
+	background-color: #EFEFEF;
+}
+
+#grit-logo {
+	float: left;
+}
+
+#grit-heading {
+	position: relative;
+	top: 10px;
+	left: 32px;
+
+	float: left;
+
+	display: none;
+}
+
+#grit-icon {
+	float: right;
+}
+
+#content-body-wrapper {
+	position: relative;
+}
+
+.overlay {
+	width: 778px;
+	/*height: 100%;*/
+	height:auto;
+
+	/*margin-top: 2px;*/
+
+	padding: 10px;
+	padding-bottom: 20px;
+
+	border: 1px solid #F7F7F7;
+
+	position: absolute;
+
+	top: 0;
+    bottom: 0;
+
+	background-color: #F7F7F7;
+	color: #000000;
+
+	opacity: 0.8;
+
+	display: none;
+}
+
+#overlay-loading {
+	display: block;
+}
+
+.overlay h2 {
+	margin: 160px auto;
+	text-align: center;
+}
+
+#content-body {
+	width: 778px;
+	/*height: 574px;*/
+
+	margin-top: 2px;
+
+	padding: 10px;
+
+	border: 1px solid #A7A7A7;
+}
+
+#content-body > nav {
+	height: 48px;
+
+	margin-bottom: 10px;
+
+	display: block;
+}
+
+#breadcrumb {
+	height: 32px;
+
+	margin: 8px;
+
+	float:left;
+}
+
+#content-body > nav a {
+	height: 32px;
+	margin: 8px;
+
+	float: right;
+}
+
+#content-body > div {
+	display: none;
+}
+
+
+/*
+ * course-list
+ */
+
+#course-list .course {
+	width: 119px;
+	height: 150px;
+	margin: 18px;
+
+	float:left;
+}
+
+#course-new-button {
+	width: 119px;
+	height: 150px;
+	margin: 18px;
+	float: left;
+}
+
+#course-list .course .course_text {
+	margin: 0;
+	text-align: center;
+}
+
+#course-list {
+	overflow: hidden;
+}
+
+#course-list .course-buttons {
+	position: absolute;
+	height: 0px;
+}
+
+#course-list .edit, #course-list .delete {
+	position: relative;
+	top: 22px;
+	left: 62px;
+	float: left;
+}
+#course-list .course-buttons img {
+	width: 24px;
+	height: 24px;
+}
+
+/*
+ * course-show
+ */
+
+#course-show > div {
+	display: none;
+}
+
+#course-show-courseName {
+	margin-bottom: 10px;
+}
+
+#exercise-list table {
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+#exercise-list th, #exercise-list td {
+	padding:10px;
+}
+
+#exercise-list th {
+	text-align:left;
+}
+
+#exercise-list table td a {
+	margin: 4px;
+	float:left;
+}
+
+#exercise-show table {
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+#exercise-show th, #exercise-show td {
+	padding:10px;
+}
+
+#exercise-show th {
+	text-align:left;
+}
+
+
+
+#connection-list table {
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+#connection-list th, #connection-list td {
+	padding:10px;
+}
+
+#connection-list th {
+	text-align:left;
+}
+
+.input-table td{
+	padding:20px;
+	font-size:18px;
+}
+
+.knopf{
+	height: 30px;
+	margin: 30px 0px;
+
+	background: #333333;
+	border:1px solid #333333; /*required or the default border for the browser will appear*/
+
+	/*style the text*/
+	font-size:1.5em;
+	/*font-family:Oswald, sans-serif; /*Oswald is available from http://www.google.com/webfonts/specimen/Oswald*/
+	letter-spacing:.1em;
+	text-shadow: 0 -1px 0px rgba(0, 0, 0, 0.3); /*give the text a shadow - doesn't appear in Opera 12.02 or earlier*/
+	color: #fff;
+	/*give the corners a small curve*/
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+
+	cursor: pointer;
+}
+
+.input-field{
+	width: 250px;
+
+	padding: 4px;
+}
+
+#connection-new, #exercise-new, #course-new{
+	margin-left:30px;
+}
+
+.xdsoft_disabled{
+	display: none;
+} 
+
+.icon-button:hover {
+	opacity: 0.7;
+}
+
+#xml-config {
+	border-bottom: 1px solid #000000;
+	padding-bottom: 20px;
+	margin-bottom: 30px;
+}
