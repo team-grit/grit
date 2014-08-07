@@ -38,7 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import preprocess.Connection;
 
 /**
- * This SVNFetcher implements the {@link Fetcher} interface to fetch
+ * This SVNFetcher is able  to fetch
  * submissions from a SVN repository.
  *
  * @author <a href="mailto:marvin.guelzow@uni-konstanz.de">Marvin Guelzow</a>

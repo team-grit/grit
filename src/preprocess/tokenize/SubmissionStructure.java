@@ -23,8 +23,7 @@ import java.util.regex.PatternSyntaxException;
 
 /**
  * Holds the structure of a submission, i.e. how directories are organized etc.
- * The {@link preprocess.Preprocessor} then uses this structure to find
- * submissions. SubmissionStructure ensures that the structure remains valid.
+ * SubmissionStructure ensures that the structure remains valid.
  * 
  * @author <a href="mailto:marvin.guelzow@uni-konstanz.de">Marvin Guelzow</a>
  */

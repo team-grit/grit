@@ -6,7 +6,7 @@ import java.util.Date;
 import preprocess.fetch.SubmissionFetchingException;
 
 /**
- * Selects the proper {@link Preprocessor} for a {@link Connection}.
+ * Selects the proper Perprocessor for a {@link Connection}.
  * 
  * @author <a href="mailto:stefano.woerner@uni-konstanz.de">Stefano Woerner</a>
  * @author <a href="mailto:gabriel.einsdorf@uni-konstanz.de">Gabriel

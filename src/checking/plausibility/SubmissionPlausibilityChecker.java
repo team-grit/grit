@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import entities.LanguageType;
 
 /**
- * Provides the static function {@link checkAllSubmissions}.
+ * Provides the static function.
  * 
  * @author <a href=mailto:marvin.guelzow@uni-konstanz.de>Marvin Guelzow</a>
  * @author <a href="mailto:david.kolb@uni-konstanz.de">David Kolb</a>

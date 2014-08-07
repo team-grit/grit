@@ -58,7 +58,7 @@ public class JavaProjectTester implements Tester {
      * @param tests
      *            Directory to the tests, in the {@link Path} constructor there
      *            should be a path.separator at the end, indicating that it's a
-     *            directory ({@link URLClassLoaded} wants it that way)
+     *            directory ({@link URLClassLoader} wants it that way)
      */
     public JavaProjectTester(Path tests) {
         testLocation = tests;

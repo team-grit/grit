@@ -51,7 +51,7 @@ public interface Tokenizer {
 
     /**
      * Returns a list of empty submission locations. This is used by the
-     * {@link Preprocessor} to generate a list of students who will be
+     * to generate a list of students who will be
      * notified.
      *
      * @return a list of empty locations

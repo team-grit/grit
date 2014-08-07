@@ -130,7 +130,7 @@ public class GeneralTokenizer implements Tokenizer {
     /**
      * Traverses a directory tree, only considering directories that match the
      * ones specified in {@link SubmissionStructure}. When reaching the lowest
-     * level, submissions are gathered with {@link extractSubmissionFiles.}
+     * level, submissions are gathered.
      * 
      * @param structure
      *            A StrcutureObj containing a description of how folders

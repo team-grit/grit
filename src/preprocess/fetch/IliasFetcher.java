@@ -39,10 +39,9 @@ import preprocess.sql_connector.SqlConnector;
 import preprocess.tokenize.Submission;
 
 /**
- * This class implements an ILIASFetcher. This implementation of the
- * {@link Fetcher} interface is capable of fetching {@link Submission} from an
+ * This class implements an ILIASFetcher, it  is capable of fetching {@link Submission} from an
  * ILIAS server.
- * 
+ *
  * @author <a href="mailto:marvin.guelzow@uni-konstanz.de">Marvin Guelzow</a>
  * @author <a href="mailto:gabriel.einsdorf@uni-konstanz.de">Gabriel
  *         Einsdorf</a>

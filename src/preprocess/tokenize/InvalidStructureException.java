@@ -19,7 +19,7 @@ package preprocess.tokenize;
 
 /**
  * Indicates that the {@link SubmissionStructure} object is not valid. This is
- * the case if the list given to the {@link SubmissionStructre} is empty or
+ * the case if the list given to the {@link preprocess.tokenize.SubmissionStructure} is empty or
  * does not contain the indicators 'TOPLEVEL' and 'SUBMISSION'.
  *
  * @author <a href="mailto:marvin.guelzow@uni-konstanz.de">Marvin Guelzow</a>

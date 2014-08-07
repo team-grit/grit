@@ -57,8 +57,6 @@ public class MailPreprocessor {
      * This method is used to process a targetDirectory's files to a list of
      * submission objects. Does not use Tokenizer.
      *
-     * @param loginUsername
-     * @param loginPassword
      *
      * @return : the list of submissions.
      * @throws SubmissionFetchingException
