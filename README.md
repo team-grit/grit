@@ -11,4 +11,5 @@
     * ````gradlew distzip```` creates a zipfile to distribute GRIT
 
 ## More information
-more about team grit: [Website](http://team-grit.com)
+[javadoc](http://team-grit.github.io/grit/)    
+more about team grit: [Website](http://team-grit.com)    
