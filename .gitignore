@@ -1,6 +1,7 @@
 bin/
 build/
 log/
+config/
 .idea/
 .project
 .settings/
