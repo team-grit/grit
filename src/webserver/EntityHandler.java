@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -41,7 +46,7 @@ public abstract class EntityHandler extends AbstractHandler {
      * A GSON instance for JSON parsing.
      */
     protected static final Gson GSON = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation().create();
+    .excludeFieldsWithoutExposeAnnotation().create();
 
     /**
      * The grit-wide logger.
@@ -75,15 +80,15 @@ public abstract class EntityHandler extends AbstractHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.jetty.server.Handler#handle(java.lang.String,
      * org.eclipse.jetty.server.Request, javax.servlet.http.HttpServletRequest,
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public void handle(String target, Request baseRequest,
-            HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void handle(
+            String target, Request baseRequest, HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
 
         /*
          * If this request contains a submitted file, use the multi-part
@@ -109,20 +114,20 @@ public abstract class EntityHandler extends AbstractHandler {
          */
         try {
             response.getWriter().println(doAction(target, request));
-        } catch (BadRequestException e) {
-            String message = e.getMessage();
+        } catch (final BadRequestException e) {
+            final String message = e.getMessage();
             LOGGER.severe(message);
             response.setContentType("text/plain;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println(message);
-        } catch (InternalActionErrorException e) {
-            String message = e.getMessage();
+        } catch (final InternalActionErrorException e) {
+            final String message = e.getMessage();
             LOGGER.severe(message);
             response.setContentType("text/plain;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(message);
-        } catch (Exception e) {
-            String message =
+        } catch (final Exception e) {
+            final String message =
                     "An unexpected error occured:\n"
                             + e.getClass().getSimpleName() + ":\n"
                             + e.getMessage();
@@ -154,9 +159,9 @@ public abstract class EntityHandler extends AbstractHandler {
      * @throws InternalActionErrorException
      *             if something else goes wrong (e.g. could not write to file)
      */
-    protected abstract String doAction(String target,
-            HttpServletRequest request) throws BadRequestException,
-            InternalActionErrorException;
+    protected abstract String doAction(
+            String target, HttpServletRequest request)
+            throws BadRequestException, InternalActionErrorException;
 
     // --------------------- PARAMETER HELPERS ---------------------
 
@@ -178,7 +183,7 @@ public abstract class EntityHandler extends AbstractHandler {
             throw new BadRequestException("The passed " + nameType
                     + " is null.");
         }
-        String name = parameter.trim();
+        final String name = parameter.trim();
         if (!name.matches(".+")) {
             throw new BadRequestException("The passed " + nameType
                     + " is invalid.");
@@ -207,7 +212,7 @@ public abstract class EntityHandler extends AbstractHandler {
         }
         try {
             return LanguageType.valueOf(parameter);
-        } catch (NullPointerException e) {
+        } catch (final NullPointerException e) {
             throw new BadRequestException(
                     "The passed language type does not exist.");
         }
@@ -234,7 +239,7 @@ public abstract class EntityHandler extends AbstractHandler {
         }
         try {
             return ConnectionType.valueOf(parameter);
-        } catch (NullPointerException e) {
+        } catch (final NullPointerException e) {
             throw new BadRequestException(
                     "The passed connection type does not exist.");
         }
@@ -255,7 +260,7 @@ public abstract class EntityHandler extends AbstractHandler {
         if (parameter == null) {
             throw new BadRequestException("The passed location is null.");
         }
-        String location = parameter.trim();
+        final String location = parameter.trim();
         if (!location.matches(".+")) {
             throw new BadRequestException("The passed location is invalid.");
         }
@@ -279,7 +284,7 @@ public abstract class EntityHandler extends AbstractHandler {
         }
         try {
             return DATE_TIME_FORMAT.parse(parameter);
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             throw new BadRequestException(e.getMessage()
                     + "\nA date has to be formatted like this: \""
                     + DATE_TIME_FORMAT.toPattern() + "\".");
@@ -307,8 +312,8 @@ public abstract class EntityHandler extends AbstractHandler {
                     + "A time has to be formatted like this: \""
                     + TIME_FORMAT.toPattern() + "\".");
         }
-        String[] time = parameter.split(":");
-        long period =
+        final String[] time = parameter.split(":");
+        final long period =
                 ((Integer.parseInt(time[0]) * 60) + Integer.parseInt(time[1])) * 60 * 1000;
         return period;
     }
@@ -399,15 +404,43 @@ public abstract class EntityHandler extends AbstractHandler {
      */
     protected void writeSubmittedFile(Part part, Path outputDirectory)
             throws BadRequestException, InternalActionErrorException {
-        String submittedFileName = part.getSubmittedFileName();
+        final String submittedFileName = part.getSubmittedFileName();
         if ((submittedFileName == null) || ("".equals(submittedFileName))) {
             throw new BadRequestException("No file submitted!");
         }
         try {
-            Path outFilePath = outputDirectory.resolve(submittedFileName);
-            InputStream testfileInputStream = part.getInputStream();
+            // make sure the temp directory exists
+            final Path tempPath = Paths.get("wdir", "temp");
+            Files.createDirectories(tempPath);
+
+            // conpy the file to the temp directory
+            final InputStream testfileInputStream = part.getInputStream();
+            final Path tempFile = tempPath.resolve(submittedFileName);
+            final String fileExtension =
+                    FilenameUtils.getExtension(submittedFileName);
+            Files.copy(testfileInputStream, tempFile,
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            final Path outFilePath;
+
+            // java files have to be in the directory matching their
+            // qualified name
+            if ("[jJ][aA][vV][aA]".matches(fileExtension)) {
+                final String qualifiedName =
+                        getQualifiedNameFromFile(tempFile);
+                String subDir =
+                        StringUtils.replaceChars(qualifiedName, '.', '/');
+                subDir = subDir + "." + fileExtension;
+                outFilePath = outputDirectory.resolve(subDir);
+            } else {
+                // not needed in other languages
+                outFilePath = outputDirectory.resolve(submittedFileName);
+            }
+
             Files.createDirectories(outFilePath.getParent());
-            Files.copy(testfileInputStream, outFilePath,
+
+            // move the file to its final position
+            Files.move(tempFile, outFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (InvalidPathException | IOException e) {
             throw new InternalActionErrorException(
@@ -434,9 +467,43 @@ public abstract class EntityHandler extends AbstractHandler {
         if (part == null) {
             return;
         }
-        String submittedFileName = part.getSubmittedFileName();
+        final String submittedFileName = part.getSubmittedFileName();
         if ((submittedFileName != null) && !("".equals(submittedFileName))) {
             writeSubmittedFile(part, outputDirectory);
         }
+    }
+
+    /**
+     * Iterates over a java source file, and identifies the fully qualified
+     * name of the class from the package declaration in the source.
+     *
+     * @param sourceFile
+     *            a java source file
+     * @return the fully qualified name of the class
+     * @throws IOException
+     *             if the source file can not be read from.
+     */
+    private String getQualifiedNameFromFile(Path sourceFile)
+            throws IOException {
+        final String packageRegex = "package\\s[^,;]+;";
+        LineIterator it;
+        String result = "";
+        it = FileUtils.lineIterator(sourceFile.toFile(), "UTF-8");
+
+        // look for the line identifying the package
+        while (it.hasNext()) {
+            final String line = it.nextLine();
+            if (line.matches(packageRegex)) {
+                result = line;
+                // strip not needed elements (the word package)
+                result = result.substring(8, result.length() - 1);
+                it.close();
+                result = result + ".";
+                break;
+            }
+        }
+        it.close();
+        // append the classname
+        return result + FilenameUtils.getBaseName(sourceFile.toString());
     }
 }
