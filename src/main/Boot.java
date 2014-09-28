@@ -55,12 +55,8 @@ public abstract class Boot {
             "config.xml");
     private static final Path STATE = Paths.get(CONFIG_PATH.toString(),
             "state.xml");
-    private static final Path DEFAULT_CONF = Paths.get(CONFIG_PATH.toString(),
-            "default.conf");
 
     private static final Logger LOGGER = Logger.getLogger("systemlog");
-    private static final int DEFAULT_PORT = Controller.getController()
-            .getConfig().getServerPort();
 
     private static Controller s_controller = null;
 

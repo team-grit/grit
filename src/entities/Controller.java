@@ -93,8 +93,8 @@ public final class Controller {
      * Instantiates a new controller.
      */
     private Controller() {
-        m_courses = new HashMap<Integer, Course>();
-        m_connections = new HashMap<Integer, Connection>();
+        m_courses = new HashMap<>();
+        m_connections = new HashMap<>();
 
         try {
             // create log directory if it does not exist
