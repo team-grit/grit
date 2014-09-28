@@ -1,14 +1,24 @@
 #GRIT
 
 ##How to install:
-*  download source from github:
-*  ````git clone git@github.com:team-grit/grit````
-*  execute the gradlew script in the root directory of the cloned repository.
+*  download source from github: ````git clone git@github.com:team-grit/grit````
+* install vagrant from [here](https://www.vagrantup.com/)
+* run ````vagrant up````, this will create a VM with all prerequisites installed.
+*  execute the gradlew script in the root directory of the cloned repository to 
+    install dependencies for development.
   *  Important gradlew commands:
     * ````gradlew eclipse```` creates an eclipse project
-    * ````gradlew idea```` creates an intelliJidea project
-    * ````gradlew install```` installs GRIT to the folder GRITFOLDER/build/install/
+    * ````gradlew idea```` creates an intelliJ IDEA project
+    * ````gradlew install```` installs GRIT to the folder GRITFOLDER/build/install/GRIT
+        (Also deploys to the VM)
     * ````gradlew distzip```` creates a zipfile to distribute GRIT
+
+##How to use GRIT with vagrant
+* Start the vm with ````vagrant up````
+* Connect to it with ````vagrant ssh````
+* Enter ````cd GRIT```` to get to the application directory
+* run GRIT with ````./runscript.sh````
+
 
 ## More information
 [javadoc](http://team-grit.github.io/grit/)    
