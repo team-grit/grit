@@ -114,7 +114,7 @@ public abstract class PdfCreator {
      *             If something goes wrong when executing pdflatex.
      * 
      */
-    public static void createPdfFromSubmission(Submission submission,
+    protected static void createPdfFromSubmission(Submission submission,
             Path outdir, String courseName, String exerciseName)
             throws IOException {
         createPdfFromPath(TexGenerator.generateTex(submission, outdir,

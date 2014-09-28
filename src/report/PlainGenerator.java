@@ -40,7 +40,7 @@ import checking.TestOutput;
  * 
  */
 
-public final class PlainGenerator {
+public final class PlainGenerator  {
 
     /**
      * This method creates a plain-text file from a SubmissionObj instance.

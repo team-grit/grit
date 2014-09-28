@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
@@ -37,7 +38,13 @@ import preprocess.Student;
  *         Einsdorf</a>
  */
 
-public abstract class PdfConcatenator {
+public class PdfConcatenator {
+
+    private static final Logger LOGGER = Logger.getLogger("systemlog");
+
+    private PdfConcatenator(){
+        // prevent instantiation
+    }
 
     /**
      * Concatinates pdfs generated {@link TexGenerator}.
@@ -54,7 +61,7 @@ public abstract class PdfConcatenator {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public static Path concatPDFS(
+    protected static Path concatPDFS(
             Path folderWithPdfs, Path outPath, String exerciseName,
             List<Student> studentsWithoutSubmissions) throws IOException {
 
@@ -106,8 +113,8 @@ public abstract class PdfConcatenator {
         writer.append("\\textsc{\\LARGE Universität Konstanz}\\\\[1.5cm]\n\n");
         writer.append("{\\large Korrektur\n\n");
         writer.append("\\rule{\\linewidth}{0.5mm}\\\\[0.4cm]\n");
-        writer.append("{\\fontfamily{qhv}\\huge\\bfseries " + exerciseName
-                + " \\\\[0.4cm]}\n\n");
+        writer.append("{\\fontfamily{qhv}\\huge\\bfseries ")
+                .append(exerciseName).append(" \\\\[0.4cm]}\n\n");
         writer.append("\\rule{\\linewidth}{0.5mm}\\\\[0.5cm]\n\n");
         writer.append("\\vfill\n");
         writer.append("{\\large\\today\n");
@@ -134,13 +141,16 @@ public abstract class PdfConcatenator {
                 new FileWriterWithEncoding(outFile, "UTF-8", true);
 
         File[] files = folderWithPdfs.toFile().listFiles();
+        if(files.length > 0){
         for (File file : files) {
 
             // We only want the the PDFs as input
             if ("pdf".equals(FilenameUtils.getExtension(file.getName()))) {
-                writer.append("\\includepdf[pages={1-}]{"
-                        + file.getAbsolutePath() + "} \n");
+                writer.append("\\includepdf[pages={1-}]{")
+                        .append(file.getAbsolutePath()).append("} \n");
             }
+        } } else {
+            LOGGER.warning("No Reports available in the specified folder: " + folderWithPdfs.toString());
         }
         writer.close();
     }
@@ -191,8 +201,9 @@ public abstract class PdfConcatenator {
             writer.append("\\begin{minipage}{.5\\textwidth}\n");
             writer.append("\\begin{itemize}\n");
             for (int i = 0; i < studentWithoutSubmissions.size(); i += 2) {
-                writer.append("\\item "
-                        + studentWithoutSubmissions.get(i).getName() + "\n");
+                writer.append("\\item ")
+                        .append(studentWithoutSubmissions.get(i).getName())
+                        .append("\n");
             }
             writer.append("\\end{itemize}\n");
             writer.append("\\end{minipage}");
@@ -200,8 +211,9 @@ public abstract class PdfConcatenator {
             writer.append("\\begin{minipage}{.5\\textwidth}\\raggedright\n");
             writer.append("\\begin{itemize}\n");
             for (int i = 1; i < studentWithoutSubmissions.size(); i += 2) {
-                writer.append("\\item "
-                        + studentWithoutSubmissions.get(i).getName() + "\n");
+                writer.append("\\item ")
+                        .append(studentWithoutSubmissions.get(i).getName())
+                        .append("\n");
             }
             writer.append("\\end{itemize}\n");
             writer.append("\\end{minipage}\n");

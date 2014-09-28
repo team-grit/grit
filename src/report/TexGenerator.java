@@ -41,7 +41,11 @@ import checking.TestOutput;
  * 
  */
 
-public abstract class TexGenerator {
+class TexGenerator {
+
+    private TexGenerator(){
+        // prevent initialisation
+    }
 
     /**
      * This method creates a TeX file from a Submission instance.

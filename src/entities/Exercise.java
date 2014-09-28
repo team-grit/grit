@@ -43,8 +43,7 @@ import preprocess.Preprocessors;
 import preprocess.Student;
 import preprocess.fetch.SubmissionFetchingException;
 import preprocess.tokenize.Submission;
-import report.PdfConcatenator;
-import report.PdfCreator;
+import report.ReportGenerator;
 import util.config.NoProperParameterException;
 import util.mailer.SendMailSSL;
 import checking.CheckingResult;
@@ -341,8 +340,8 @@ public class Exercise {
                             compileResult, testResult));
 
                     /* score card creation */
-                    PdfCreator.createPdfFromSubmission(submission, tempPdfPath,
-                            courseName, exerciseName);
+                    ReportGenerator.generateReport(submission, tempPdfPath,
+                            courseName, exerciseName, ReportGenerator.ReportType.PDF);
                     try {
                         FileUtils.cleanDirectory(binpath.toFile());
                     } catch (IOException e) {
@@ -359,7 +358,7 @@ public class Exercise {
 
         /* merge the single scorecard files into a large one. */
         try {
-            PdfConcatenator.concatPDFS(context.getTempPdfPath(),
+            ReportGenerator.concatenatePdfReports(context.getTempPdfPath(),
                     context.getOutputPath(), context.getExerciseName(),
                     studentsWithoutSubmission);
         } catch (IOException e) {
