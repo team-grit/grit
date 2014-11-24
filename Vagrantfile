@@ -9,6 +9,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
+  # Setting the timezone, requires the vagrant-timezone plugin,
+  # install it with:  vagrant plugin install vagrant-timezone
+  if Vagrant.has_plugin?("vagrant-timezone")
+    config.timezone.value = "Europe/Berlin"
+  end
+
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "jfredett/arch-base"
   config.vm.provision :shell, path: "vagrant-bootstrap.sh"
