@@ -76,7 +76,7 @@ dependencies {
 
 // No need to install gradle
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.2.1'
 }
 
 // Distribution
@@ -109,6 +109,14 @@ uploadArchives {
         flatDir {
             dirs 'repos'
         }
+    }
+}
+
+startScripts {
+    doLast {
+    String optionText = 'DEFAULT_JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="' + theDebugPort
+        unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', optionText)
+        windowsScript.text = windowsScript.text.replace('DEFAULT_JVM_OPTS=', optionText)
     }
 }
 
