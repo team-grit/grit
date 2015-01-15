@@ -425,7 +425,7 @@ public abstract class EntityHandler extends AbstractHandler {
 
             // java files have to be in the directory matching their
             // qualified name
-            if ("[jJ][aA][vV][aA]".matches(fileExtension)) {
+            if (fileExtension.equals("java")) {
                 final String qualifiedName =
                         getQualifiedNameFromFile(tempFile);
                 String subDir =
