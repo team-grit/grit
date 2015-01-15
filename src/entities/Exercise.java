@@ -244,9 +244,11 @@ public class Exercise {
         status = "processing submissions";
         for (Submission submission : submissionsToProcess) {
             try {
+            	LOGGER.info("checking plausability");
                 checkPlausibility(submission);
-                if (submission.isPlausible()) {
+                if (submission.isPlausible()) {                	
                     /* compile */
+                	LOGGER.info("compiling submissions");
                     CompilerOutput compileResult =
                             compileSubmission(submission);
                     /* create checking result */
@@ -330,16 +332,19 @@ public class Exercise {
                 checkPlausibility(submission);
                 if (submission.isPlausible()) {
                     /* compile */
+                	LOGGER.info("compiling submission");
                     CompilerOutput compileResult =
                             compileSubmission(submission);
                     /* test */
+                    LOGGER.info("testing submission");
                     TestOutput testResult =
                             testSubmission(binpath, compileResult);
-                    /* create checking result */
+                    /* create checking result */                    
                     submission.setCheckingResult(new CheckingResult(
                             compileResult, testResult));
 
                     /* score card creation */
+                    LOGGER.info("generate scorecard");
                     ReportGenerator.generateReport(submission, tempPdfPath,
                             courseName, exerciseName, ReportGenerator.ReportType.PDF);
                     try {
@@ -362,7 +367,7 @@ public class Exercise {
                     context.getOutputPath(), context.getExerciseName(),
                     studentsWithoutSubmission);
         } catch (IOException e) {
-            context.logError(e.getMessage());
+            context.logError("error while merging scorecards: " + e.getMessage());
             status = "error while generating pdf for printout";
             m_taskPool.shutdownNow();
             return;
@@ -497,7 +502,7 @@ public class Exercise {
      */
     private void notifyStudentsWithoutSubmission(
             List<Student> studentsWithoutSubmissions) {
-        long in12hours = System.currentTimeMillis() + (6 * 60 * 60 * 1000);
+        long in12hours = System.currentTimeMillis() + (12 * 60 * 60 * 1000);
         long in6hours = System.currentTimeMillis() + (6 * 60 * 60 * 1000);
         long lowerBoundary = context.getDeadline().getTimeInMillis();
         long upperBoundary = context.getPeriod() + lowerBoundary;
