@@ -19,6 +19,8 @@
 * Enter ````cd GRIT```` to get to the application directory
 * run GRIT with ````./runscript.sh````
 
+## Debugging GRIT
+* You can debug GRIT with a remote debugger by connecting to the debug port specified in the gradle properties (Default is ````6001````)
 
 ## More information
 [javadoc](http://team-grit.github.io/grit/)    
