@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.junit.runner.notification.Failure;
 
@@ -326,7 +327,7 @@ class TexGenerator {
         writer.append("\\paragraph{Code}~\\\\\n");
 
         for (File f : FileUtils.listFiles(submission.getSourceCodeLocation()
-                .toFile(), FileFilterUtils.fileFileFilter(), null)) {
+                .toFile(), FileFilterUtils.fileFileFilter(), TrueFileFilter.INSTANCE)) {
 
             // determines programming language of the file and adjusts the
             // lstlisting according to it
