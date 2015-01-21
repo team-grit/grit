@@ -111,7 +111,7 @@ public class JavaCompileChecker implements CompileChecker {
 
         compilerInvocation.add("javac");
         compilerInvocation.add("-cp");
-        String testDependencies = ".:" + m_junitLocation + ":" + outputFolder;
+        String testDependencies = ".:" + m_junitLocation + ":" + outputFolder.toAbsolutePath();
         compilerInvocation.add(testDependencies);
 
         compilerInvocation.add("-d");
