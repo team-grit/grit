@@ -18,6 +18,7 @@
 package checking.compile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,8 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.apache.commons.io.FileUtils;
 
 import checking.CompilerOutput;
 
@@ -48,6 +51,10 @@ public class JavaCompileChecker implements CompileChecker {
     // folder containing the junit jar
     private final Path m_junitLocation = Paths
             .get("res", "javac", "junit.jar").toAbsolutePath();
+    // folder containing additional libraries 
+    private final Path m_libLocation = Paths
+    		.get("res", "javalib").toAbsolutePath();
+    
     private Path m_junitTestFilesLocation = null;
 
     /**
@@ -111,8 +118,17 @@ public class JavaCompileChecker implements CompileChecker {
 
         compilerInvocation.add("javac");
         compilerInvocation.add("-cp");
-        String testDependencies = ".:" + m_junitLocation + ":" + outputFolder.toAbsolutePath();
-        compilerInvocation.add(testDependencies);
+        // Add testDependencies to classpath
+        String cp = ".:" + m_junitLocation + ":" + outputFolder.toAbsolutePath();        
+        // Add all additional .jar files contained in javalib directory to the classpath
+        if (!m_libLocation.toFile().exists()){
+        	m_libLocation.toFile().mkdir();
+        } else {
+        	for(File f : FileUtils.listFiles(m_libLocation.toFile(), new String[]{"jar"}, false)){
+        		cp = cp + ":" + f.getAbsolutePath(); 		
+        	}
+        }
+        compilerInvocation.add(cp);
 
         compilerInvocation.add("-d");
         compilerInvocation.add(m_junitTestFilesLocation.toAbsolutePath()
@@ -261,9 +277,17 @@ public class JavaCompileChecker implements CompileChecker {
         }
 
         // Add JUnit and the current directory to the classpath.s
-        compilerInvocation.add("-cp");
-        compilerInvocation.add(".:"
-                + m_junitLocation.toAbsolutePath().toString());
+        compilerInvocation.add("-cp");   
+        String cp = ".:" + m_junitLocation.toAbsolutePath().toString();
+        // Add all additional .jar files contained in javalib directory to the classpath
+        if (!m_libLocation.toFile().exists()){
+        	m_libLocation.toFile().mkdir();
+        } else {
+        	for(File f : FileUtils.listFiles(m_libLocation.toFile(), new String[]{"jar"}, false)){
+        		cp = cp + ":" + f.getAbsolutePath(); 		
+        	}
+        }
+        compilerInvocation.add(cp);
 
         // Check for the existence of the program file we are trying to
         // compile.
