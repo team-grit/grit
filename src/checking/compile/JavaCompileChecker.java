@@ -129,6 +129,10 @@ public class JavaCompileChecker implements CompileChecker {
         	}
         }
         compilerInvocation.add(cp);
+        
+        //make sure java uses utf8 for encoding
+        compilerInvocation.add("-encoding");
+        compilerInvocation.add("UTF-8");
 
         compilerInvocation.add("-d");
         compilerInvocation.add(m_junitTestFilesLocation.toAbsolutePath()
@@ -288,6 +292,10 @@ public class JavaCompileChecker implements CompileChecker {
         	}
         }
         compilerInvocation.add(cp);
+        
+        //make sure java uses utf8 for encoding
+        compilerInvocation.add("-encoding");
+        compilerInvocation.add("UTF-8");
 
         // Check for the existence of the program file we are trying to
         // compile.
