@@ -16,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "jfredett/arch-base"
+  config.vm.box = "ubuntu/vivid64"
   config.vm.provision :shell, path: "vagrant-bootstrap.sh"
 
 
@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network :forwarded_port, host: 8080, guest: 8080
-  #Debub port: 
+  #Debub port:
   config.vm.network :forwarded_port, host: 6001, guest: 6001
 
 
