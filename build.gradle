@@ -8,7 +8,7 @@ group = theGroup
 sourceCompatibility = theSourceCompatibility
 version = theVersion + getDate()
 
-mainClassName = 'main.Boot'
+mainClassName = 'de.teamgrit.grit.main.Boot'
 
 jar {
     manifest {
