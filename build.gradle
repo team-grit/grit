@@ -6,9 +6,8 @@ apply plugin: 'idea'
 group = theGroup
 
 sourceCompatibility = theSourceCompatibility
-release=theRelease
 version=theVersion
-if(release){
+if(theRelease){
   version = theVersion + getDate()
 }
 
