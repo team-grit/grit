@@ -89,7 +89,7 @@ public class JavaProjectTester implements Tester {
 
             List<Result> results = new LinkedList<>();
 
-            // create teh classloader
+            // create the classloader
             URL submissionURL = submissionBinariesLocation.toUri().toURL();
             URL testsURL = testLocation.toUri().toURL();
 

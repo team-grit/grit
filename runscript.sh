@@ -1,4 +1,5 @@
 #!/bin/bash
 
 chmod +x bin/GRIT
-./GRIT/bin/GRIT
+cd GRIT
+./bin/GRIT

@@ -66,7 +66,6 @@ public abstract class Boot {
      * Starts grit.
      * 
      * @param args
-     *            needed by JAVA, not actually used.
      */
     public static void main(String[] args) {
 
