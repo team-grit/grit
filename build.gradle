@@ -1,7 +1,8 @@
 apply plugin: "java"
 apply plugin: 'eclipse'
-apply plugin: 'application'
 apply plugin: 'idea'
+apply plugin: 'application'
+apply plugin: 'sonar-runner'
 
 group = theGroup
 
@@ -102,6 +103,17 @@ installApp {
 	include 'runscript.bat'
 	include 'runscript.sh'
     }
+}
+
+task dockerRebuild(dependsOn: 'installApp') << {
+	exec {
+		executable "cp"
+		args "-rf","build/install/GRIT", "docker/"
+	}
+	exec {
+		executable "docker"
+		args "build", "-t", "teamgrit/grit:extra","."
+	}
 }
 
 uploadArchives {
