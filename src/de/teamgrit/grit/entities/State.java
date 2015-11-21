@@ -169,7 +169,10 @@ public final class State {
                 connection.getLocation());
         m_state.addProperty(connectionPrefix + "/remote @type", connection
                 .getConnectionType().toString());
-
+        m_state.addProperty(connectionPrefix + "/remote @protocol",
+            connection.getProtocol());
+        m_state.addProperty(connectionPrefix + "/remote @allowedDomain",
+            connection.getAllowedDomain());
         m_state.addProperty(connectionPrefix + "/auth @username",
                 connection.getUsername());
         m_state.addProperty(connectionPrefix + "/auth @password",
@@ -271,10 +274,12 @@ public final class State {
             ConnectionType connectionType = ConnectionType
                     .valueOf(connectionNode.getString("remote/@type"));
             String location = connectionNode.getString("remote/@location");
+            String protocol = connectionNode.getString("remote/@protocol");
             String username = connectionNode.getString("auth/@username");
             String password = connectionNode.getString("auth/@password");
             String sshUsername = connectionNode.getString("ssh/@username");
             String sshKeyFileName = connectionNode.getString("ssh/@keyfile");
+            String allowedDomain = connectionNode.getString("remote/@allowedDomain");
 
             // extract structure
             List<HierarchicalConfiguration> structure = connectionNode
@@ -285,8 +290,8 @@ public final class State {
             }
 
             Connection connection = new Connection(id, name, connectionType,
-                    location, username, password, sshUsername, sshKeyFileName,
-                    structureList);
+                    location, protocol, username, password, sshUsername, sshKeyFileName,
+                    structureList, allowedDomain);
 
             connectionsMap.put(id, connection);
         }

@@ -75,12 +75,13 @@ class BootHelpers {
                         + "<server>"
                         + "\n"
                         + "<port value=\"8080\"/>"
+                        + "<loglevel value=\"INFO\"/>"
                         + "\n"
                         + "</server>"
                         + "\n"
                         + "<email>"
                         + "\n"
-                        + "<auth password=\"\" adress=\"\" host=\"\"/>"
+                        + "<auth host=\"\" port=\"\" senderAddress=\"\" password=\"\" />"
                         + "\n"
                         + "</email>"
                         + "\n"
@@ -167,7 +168,14 @@ class BootHelpers {
 
         programArguments.clear();
         buildExecutor = null;
-
+        
+        // check if correct Texlive Version is installed
+     	try {
+     		checkTexLiveVersion();	
+		} catch (IOException e) {
+			LOGGER.severe("check Tex Live Version failed. Reason: " + e.toString());
+		}
+     	
         // check for pdf
         programArguments.add("pdflatex");
         programArguments.add("--version");
@@ -241,4 +249,44 @@ class BootHelpers {
 
         }
     }
+    
+    /**
+	 * Checks the current version of the Texlive package
+	 * 
+	 * @throws IOException
+	 *             If something goes wrong when executing pdflatex.
+	 * 
+	 */
+	private static void checkTexLiveVersion() throws IOException {
+
+		LOGGER.info("Checking TexLive Version");
+		LOGGER.finer("Building Process for Version check");
+
+		ProcessBuilder pb = new ProcessBuilder("/usr/bin/tex", "-version");
+		pb.redirectErrorStream(true);
+		Process process = pb.start();
+
+		final BufferedReader br = new BufferedReader(new InputStreamReader(
+				process.getInputStream()));
+
+		// Only the first line is interesting for version information
+		final String line = br.readLine();
+        br.close();
+        
+		// Texlive newer than 2012 is necessary for correct compilation
+		// of the tex files.
+
+		final String[] token = line.split("Live |/");
+		LOGGER.finest("TeXLive-Version found: "+token[1]);
+
+		if (token[1].compareTo("2013") >= 0) {
+			LOGGER.finer("Check of TexLive Version succesfull");
+		} else {
+			LOGGER.warning("Check TexLive Version is to old, please update it. "
+			    + "Otherwise, a proper report-generation cannot be guaranteed.");
+		}
+		
+		
+
+	}
 }

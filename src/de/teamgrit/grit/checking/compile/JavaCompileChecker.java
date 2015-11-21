@@ -105,7 +105,8 @@ public class JavaCompileChecker implements CompileChecker {
         // First we build the command to invoke the compiler. This consists of
         // the compiler executable, the path of the
         // file to compile and compiler flags.
-
+    	
+    	LOGGER.info("Checkprogram Name: " + compilerName);
         List<String> compilerInvocation =
                 createCompilerInvocation(pathToSourceFolder, outputFolder,
                         compilerName, compilerFlags);
@@ -167,7 +168,7 @@ public class JavaCompileChecker implements CompileChecker {
                     new ProcessBuilder(compilerInvocation);
             // make sure the compiler stays in its directory.
             if (Files.isDirectory(pathToSourceFolder,
-                    LinkOption.NOFOLLOW_LINKS)) {
+                    LinkOption.NOFOLLOW_LINKS)) {	
                 compilerProcessBuilder.directory(pathToSourceFolder.toFile());
             } else {
                 compilerProcessBuilder.directory(pathToSourceFolder

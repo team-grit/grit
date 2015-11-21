@@ -24,6 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -34,7 +41,9 @@ import org.apache.commons.lang3.StringUtils;
 import de.teamgrit.grit.entities.ConnectionUsedException;
 import de.teamgrit.grit.preprocess.Connection;
 import de.teamgrit.grit.preprocess.ConnectionType;
+import de.teamgrit.grit.preprocess.CouldNotConnectException;
 import de.teamgrit.grit.preprocess.tokenize.InvalidStructureException;
+import de.teamgrit.grit.util.mailer.EncryptorDecryptor;
 
 /**
  * This is the entity handler for connections. It presents CRUD actions for
@@ -103,8 +112,10 @@ public class ConnectionHandler extends EntityHandler {
         String location;
         String username;
         String password;
+        String protocol;
         String sshUsername;
         List<String> structure;
+        String allowedDomain;
         try {
             connectionName =
                     parseName(request.getParameter("connectionName"),
@@ -113,7 +124,17 @@ public class ConnectionHandler extends EntityHandler {
                     parseConnectionType(request.getParameter("connectionType"));
             location = parseLocation(request.getParameter("location"));
             username = parseName(request.getParameter("username"), "username");
-            password = request.getParameter("password");
+            //The following is important to encrypt the inserted password.
+            EncryptorDecryptor ed = new EncryptorDecryptor();
+            password = ed.encrypt(request.getParameter("password"));
+
+            if (connectionType == ConnectionType.MAIL) {
+                protocol = parseProtocol(request.getParameter("protocol"));
+                allowedDomain = parseAllowedDomain(request.getParameter("allowedDomain"));
+            } else {
+              protocol = null;
+              allowedDomain = null;
+            }
             if (connectionType == ConnectionType.ILIAS) {
                 sshUsername =
                         parseName(request.getParameter("sshUsername"),
@@ -127,6 +148,18 @@ public class ConnectionHandler extends EntityHandler {
                 structure = null;
             }
         } catch (BadRequestException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (IOException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (IllegalBlockSizeException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (InvalidKeyException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (BadPaddingException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (NoSuchPaddingException e) {
             throw new BadRequestException(errorPrefix + e.getMessage());
         }
 
@@ -155,14 +188,17 @@ public class ConnectionHandler extends EntityHandler {
         try {
             connection =
                     m_controller.addConnection(connectionName, connectionType,
-                            location, username, password, sshUsername,
-                            keyFileName, structure);
+                            location, protocol, username, password, sshUsername,
+                            keyFileName, structure, allowedDomain);
         } catch (ConfigurationException e) {
             throw new InternalActionErrorException(errorPrefix
                     + "Could not create connection.");
         } catch (InvalidStructureException e) {
             throw new InternalActionErrorException(errorPrefix
                     + "The submitted structure is invalid.");
+        } catch (CouldNotConnectException e) {
+          throw new InternalActionErrorException(errorPrefix
+              + "The submitted connection is invalid. Please check.");
         }
 
         /* Write the key-file if this is an ILIAS connection. */
@@ -209,9 +245,11 @@ public class ConnectionHandler extends EntityHandler {
         ConnectionType connectionType;
         String location;
         String username;
+        String protocol;
         String password;
         String sshUsername;
         List<String> structure;
+        String allowedDomain;
         try {
             connectionName =
                     parseName(request.getParameter("connectionName"),
@@ -220,7 +258,17 @@ public class ConnectionHandler extends EntityHandler {
                     parseConnectionType(request.getParameter("connectionType"));
             location = parseLocation(request.getParameter("location"));
             username = parseName(request.getParameter("username"), "username");
-            password = request.getParameter("password");
+            //The following is important to encrypt the inserted password.
+            EncryptorDecryptor ed = new EncryptorDecryptor();
+            password = ed.encrypt(request.getParameter("password"));
+
+            if (connectionType == ConnectionType.MAIL) {
+              protocol = parseProtocol(request.getParameter("protocol"));
+              allowedDomain = parseAllowedDomain(request.getParameter("allowedDomain"));
+            } else {
+              protocol = null;
+              allowedDomain = null;
+            }
             if (connectionType == ConnectionType.ILIAS) {
                 sshUsername =
                         parseName(request.getParameter("sshUsername"),
@@ -234,6 +282,18 @@ public class ConnectionHandler extends EntityHandler {
                 structure = null;
             }
         } catch (BadRequestException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (IOException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (IllegalBlockSizeException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (InvalidKeyException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (BadPaddingException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            throw new BadRequestException(errorPrefix + e.getMessage());
+        } catch (NoSuchPaddingException e) {
             throw new BadRequestException(errorPrefix + e.getMessage());
         }
 
@@ -264,14 +324,17 @@ public class ConnectionHandler extends EntityHandler {
             connection =
                     m_controller.updateConnection(connectionIdInt,
                             connectionName, connectionType, location,
-                            username, password, sshUsername, keyFileName,
-                            structure);
+                            protocol, username, password, sshUsername,
+                            keyFileName, structure, allowedDomain);
         } catch (ConfigurationException e) {
             throw new InternalActionErrorException(errorPrefix
                     + "Could not create connection.");
         } catch (InvalidStructureException e) {
             throw new InternalActionErrorException(errorPrefix
                     + "The submitted structure is invalid.");
+        } catch (CouldNotConnectException e) {
+          throw new InternalActionErrorException(errorPrefix
+              + "The submitted connection is invalid. Please check.");
         }
 
         /* Write the key-file if this is an ILIAS connection. */
@@ -338,5 +401,4 @@ public class ConnectionHandler extends EntityHandler {
 
         return structureList;
     }
-
 }

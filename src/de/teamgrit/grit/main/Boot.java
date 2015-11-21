@@ -21,14 +21,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -91,6 +86,7 @@ public abstract class Boot {
             LOGGER.severe("Could not load the config: " + e.getMessage());
             return;
         }
+        LOGGER.setLevel(Level.parse(s_controller.getConfig().getLogLevel()));
         try {
             loadState();
         } catch (IOException | ConfigurationException e) {
@@ -170,6 +166,7 @@ public abstract class Boot {
             config.getSenderMailAdress();
             config.getServerPort();
             config.getSmtpHost();
+            config.getLogLevel();
             return true;
         } catch (IllegalArgumentException e) {
             return false;

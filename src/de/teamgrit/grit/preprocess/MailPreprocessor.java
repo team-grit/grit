@@ -71,19 +71,21 @@ public class MailPreprocessor {
         String loginUsername = connection.getUsername();
         String loginPassword = connection.getPassword();
         String mailServer = connection.getLocation();
+        String protocol = connection.getProtocol();
+        String allowedDomain = connection.getAllowedDomain();
 
         List<Submission> submissions = null;
 
         List<String> structureList = new LinkedList<>();
         structureList.add("TOPLEVEL");
         structureList.add(".*@.*");
-        structureList.add(exerciseName.toString());
+        structureList.add(exerciseName.toString().replaceAll("\\s", "_"));
         structureList.add("SUBMISSION");
 
         Path submissionDirectory =
-                MailFetcher.fetchSubmissions(targetDirectory, mailServer,
-                        loginUsername, loginPassword, startTime, deadline,
-                        courseName, exerciseName);
+                MailFetcher.fetchSubmissions(targetDirectory, mailServer, 
+                  protocol, loginUsername, loginPassword, startTime, 
+                    deadline,courseName, exerciseName, allowedDomain);
 
         GeneralTokenizer tokenizer =
                 new GeneralTokenizer(fileRegex, archiveRegex);
@@ -139,11 +141,6 @@ public class MailPreprocessor {
             }
 
             map.put(currentSubmission.getStudent(), currentSubmission);
-        }
-
-        if (submissions.isEmpty()) {
-            LOGGER.severe("No submissions were found. ");
-            throw new SubmissionFetchingException("Submissions list is empty.");
         }
 
         LOGGER.info("Processed all submissions");

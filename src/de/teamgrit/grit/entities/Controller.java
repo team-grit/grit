@@ -37,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 import de.teamgrit.grit.main.Boot;
 import de.teamgrit.grit.preprocess.Connection;
 import de.teamgrit.grit.preprocess.ConnectionType;
+import de.teamgrit.grit.preprocess.CouldNotConnectException;
 import de.teamgrit.grit.preprocess.tokenize.InvalidStructureException;
 import de.teamgrit.grit.util.config.Configuration;
 
@@ -120,7 +121,7 @@ public final class Controller {
         try {
             m_config = new Configuration(CONFIG_LOCATION.toFile());
         } catch (ConfigurationException | FileNotFoundException e) {
-            LOGGER.severe("Error while creating Controller: " + e.getMessage());
+            LOGGER.severe("Error while creating Controller: " + e.toString());
         }
     }
 
@@ -255,7 +256,9 @@ public final class Controller {
     }
 
     /**
-     * Removes a {@link Course} and and its {@link Exercise}s.
+     * Removes a {@link Course} and and its {@link Exercise}s as
+     * well as their corresponding pdf-reports (whether temporary or
+     * the final one).
      *
      * @param courseId
      *            the id of {@link Course} that should be removed
@@ -278,6 +281,8 @@ public final class Controller {
         m_state.deleteCourse(courseId);
         FileUtils.deleteDirectory(Paths.get("wdir", "course-" + courseId)
                 .toFile());
+        FileUtils.deleteDirectory(Paths.get("res","web","pdf","course-" + courseId)
+                .toFile());
         return course;
 
     }
@@ -285,7 +290,8 @@ public final class Controller {
     // --------------------- CONNECTIONS ---------------------
 
     /**
-     * Adds a connection to the system.
+     * Adds a connection to the system. It checks the validity of the
+     * information before adding it to the list.
      * 
      * @param connectionName
      *            name of the connection
@@ -293,6 +299,8 @@ public final class Controller {
      *            the type of the connection (e.g. SVN, ILIAS)
      * @param location
      *            the location (address) of the data source
+     * @param protocol
+     *            the protocol of the connection, if it's MAIL
      * @param username
      *            the username to login
      * @param password
@@ -308,16 +316,21 @@ public final class Controller {
      *             if saving to state fails
      * @throws InvalidStructureException
      *             if the specified structure is invalid
+     * @throws CouldNotConnectException 
+     *             if the connection could not be established
      */
     public Connection addConnection(String connectionName,
-            ConnectionType connectionType, String location, String username,
+            ConnectionType connectionType, String location, String protocol, String username,
             String password, String sshUsername, String keyFileName,
-            List<String> structure) throws ConfigurationException,
-            InvalidStructureException {
+            List<String> structure, String allowedDomain) throws ConfigurationException,
+            InvalidStructureException, CouldNotConnectException {
         Connection connection =
                 new Connection(m_nextConnectionId, connectionName,
-                        connectionType, location, username, password,
-                        sshUsername, keyFileName, structure);
+                        connectionType, location, protocol, username, password,
+                        sshUsername, keyFileName, structure, allowedDomain);
+        if (!connection.checkConnection()) {
+          throw new CouldNotConnectException("Connection could not be established");
+        }
         m_connections.put(m_nextConnectionId, connection);
         m_nextConnectionId++;
         m_state.addConnection(connection);
@@ -325,7 +338,8 @@ public final class Controller {
     }
 
     /**
-     * Updates a connection with new information.
+     * Updates a connection with new information and checks their validity
+     * before adding them to the new list.
      * 
      * @param id
      *            the id of the updated connection
@@ -345,22 +359,29 @@ public final class Controller {
      *            the new keyfile for the ssh username
      * @param structure
      *            the new submission structure
+     * @param allowedDomain
+     *            the allowed domain for the mail connection
      * @return the updated connection
      * @throws InvalidStructureException
      *             if the submission structure is invalid
      * @throws ConfigurationException
      *             if saving to state fails
+     * @throws CouldNotConnectException 
+     *             in case a connection could not be established
      */
     public Connection updateConnection(int id, String connectionName,
-            ConnectionType connectionType, String location, String username,
-            String password, String sshUsername, String keyFileName,
-            List<String> structure) throws InvalidStructureException,
-            ConfigurationException {
+            ConnectionType connectionType, String location, String protocol,
+            String username, String password, String sshUsername,
+            String keyFileName, List<String> structure, String allowedDomain) 
+                throws InvalidStructureException,
+            ConfigurationException, CouldNotConnectException {
         Connection modifiedConnection =
                 new Connection(id, connectionName, connectionType, location,
-                        username, password, sshUsername, keyFileName,
-                        structure);
-
+                        protocol, username, password, sshUsername, keyFileName,
+                        structure, allowedDomain);
+        if (!modifiedConnection.checkConnection()) {
+          throw new CouldNotConnectException("Checking connection failed");
+        }
         m_connections.put(id, modifiedConnection);
         m_state.deleteConnection(id);
         m_state.addConnection(modifiedConnection);

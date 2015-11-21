@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.teamgrit.grit.preprocess.tokenize.Submission;
 
@@ -38,87 +39,95 @@ import de.teamgrit.grit.preprocess.tokenize.Submission;
 
 public abstract class PdfCreator {
 
-    /**
-     * Creates a pdf from a given Path to a .tex file.
-     * 
-     * 
-     * @param pathToTexFile
-     *            A Path to a .tex file.
-     * @throws IOException
-     *             if pdflatex encounters a problem
-     */
-    public static void createPdfFromPath(Path pathToTexFile) throws IOException {
-        createPdfFromPath(pathToTexFile, pathToTexFile.getParent());
-    }
 
-    /**
-     * Creates a pdf from a given Path to a .tex file in the given output
-     * directory.
-     * 
-     * @param pathToTexFile
-     *            A Path to a .tex file.
-     * @param outputDir
-     *            the output directory
-     * @throws IOException
-     *             If something goes wrong when executing pdflatex.
-     */
-    public static void createPdfFromPath(Path pathToTexFile, Path outputDir)
-            throws IOException {
-        List<String> compilerInvocation = new LinkedList<>();
+	private static final Logger LOGGER = Logger.getLogger("systemlog");
 
-        compilerInvocation.add("pdflatex");
-        compilerInvocation.add("-interaction=batchmode");
-        compilerInvocation.add("--output-directory=" + outputDir.toString());
+	/**
+	 * Creates a pdf from a given Path to a .tex file.
+	 * 
+	 * 
+	 * @param pathToTexFile
+	 *            A Path to a .tex file.
+	 * @throws IOException
+	 *             if pdflatex encounters a problem
+	 */
+	public static void createPdfFromPath(Path pathToTexFile) throws IOException {
+		createPdfFromPath(pathToTexFile, pathToTexFile.getParent());
+	}
 
-        if ((pathToTexFile == null)
-                || (pathToTexFile.compareTo(Paths.get("")) == 0)) {
-            throw new FileNotFoundException("No file to compile specified");
-        } else {
-            compilerInvocation.add(pathToTexFile.toString());
-        }
+	/**
+	 * Creates a pdf from a given Path to a .tex file in the given output
+	 * directory.
+	 * 
+	 * @param pathToTexFile
+	 *            A Path to a .tex file.
+	 * @param outputDir
+	 *            the output directory
+	 * @throws IOException
+	 *             If something goes wrong when executing pdflatex.
+	 */
+	public static void createPdfFromPath(Path pathToTexFile, Path outputDir)
+			throws IOException {
+		List<String> compilerInvocation = new LinkedList<>();
 
-        Process compilerProcess;
-        ProcessBuilder compilerProcessBuilder = new ProcessBuilder(
-                compilerInvocation).redirectErrorStream(true);
+		LOGGER.fine("Creating pdf from report located in "
+				+ pathToTexFile.toString());
 
-        compilerProcessBuilder.directory(new File(System
-                .getProperty("user.dir")));
-        compilerProcess = compilerProcessBuilder.start();
+		compilerInvocation.add("pdflatex");
+		compilerInvocation.add("-interaction=batchmode");
+		compilerInvocation.add("--output-directory=" + outputDir.toString());
 
-        // we need to consume the output of pdflatex to stop it from
-        // freezing on windows
-        final InputStream stdout = compilerProcess.getInputStream();
+		if ((pathToTexFile == null)
+				|| (pathToTexFile.compareTo(Paths.get("")) == 0)) {
+			throw new FileNotFoundException("No file to compile specified");
+		} else {
+			compilerInvocation.add(pathToTexFile.toString());
+		}
 
-        // Fixes a bug with Windows (outputstream buffer is too small)
-        final byte[] devnull = new byte[2048];
-        while (stdout.read(devnull) != -1) {
-            ;
-        }
+		LOGGER.finer("Creating a configuring compiler process");
+		Process compilerProcess;
+		ProcessBuilder compilerProcessBuilder = new ProcessBuilder(
+				compilerInvocation).redirectErrorStream(true);
 
-    }
+		compilerProcessBuilder.directory(new File(System
+				.getProperty("user.dir")));
+		compilerProcess = compilerProcessBuilder.start();
 
-    /**
-     * Creates a pdf Report from a given {@link Submission} (using
-     * {@link de.teamgrit.grit.report.PdfCreator#createPdfFromPath}).
-     * 
-     * @param submission
-     *            A SubmissionObj containing the information that the content
-     *            gets generated from.
-     * @param outdir
-     *            the directory where the finished PDF is put.
-     * @param courseName
-     *            the name of the course the exercise belongs to
-     * @param exerciseName
-     *            the name of the exercise
-     * @throws IOException
-     *             If something goes wrong when executing pdflatex.
-     * 
-     */
-    protected static void createPdfFromSubmission(Submission submission,
-            Path outdir, String courseName, String exerciseName)
-            throws IOException {
-        createPdfFromPath(TexGenerator.generateTex(submission, outdir,
-                courseName, exerciseName));
-    }
+		// we need to consume the output of pdflatex to stop it from
+		// freezing on windows
+		final InputStream stdout = compilerProcess.getInputStream();
+
+		// Fixes a bug with Windows (outputstream buffer is too small)
+		final byte[] devnull = new byte[2048];
+		while (stdout.read(devnull) != -1) {
+			;
+		}
+
+	}
+
+	/**
+	 * Creates a pdf Report from a given {@link Submission} (using
+	 * {@link de.teamgrit.grit.report.PdfCreator#createPdfFromPath}).
+	 * 
+	 * @param submission
+	 *            A SubmissionObj containing the information that the content
+	 *            gets generated from.
+	 * @param outdir
+	 *            the directory where the finished PDF is put.
+	 * @param courseName
+	 *            the name of the course the exercise belongs to
+	 * @param exerciseName
+	 *            the name of the exercise
+	 * @throws IOException
+	 *             If something goes wrong when executing pdflatex.
+	 * 
+	 */
+	protected static void createPdfFromSubmission(Submission submission,
+			Path outdir, String courseName, String exerciseName)
+			throws IOException {
+		createPdfFromPath(TexGenerator.generateTex(submission, outdir,
+				courseName, exerciseName));
+	}
+
 
 }
