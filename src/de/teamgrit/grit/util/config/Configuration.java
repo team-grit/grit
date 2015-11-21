@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -44,6 +46,7 @@ public class Configuration {
 
     /* mail configuration of mail address we want to send mails from */
     private String m_SMTP_HOST;
+    private String m_MAIL_PORT;
     private String m_SENDER_MAIL_ADRESS;
     private String m_MAIL_PASSWORD;
     /* admin info */
@@ -52,6 +55,7 @@ public class Configuration {
     private String m_PASSWORD_ADMIN;
     /* server info */
     private int m_SERVER_PORT;
+    private String m_LOGLEVEL;
 
     // --------------------------- CONSTRUCTORS ---------------------------
 
@@ -97,6 +101,15 @@ public class Configuration {
     }
 
     /**
+     * Returns the log level of the logger.
+     * 
+     * @return the currently set logLevel
+     */
+    public String getLogLevel() {
+      return m_LOGLEVEL;
+    }
+
+    /**
      * Gets the smtp host.
      * 
      * @return the smtp host
@@ -112,6 +125,15 @@ public class Configuration {
      */
     public String getSenderMailAdress() {
         return m_SENDER_MAIL_ADRESS;
+    }
+
+    /**
+     * Gets the mail-protocol for notifications.
+     * Usually smtp or smtps.
+     * @return
+     */
+    public String getMailPort() {
+      return m_MAIL_PORT;
     }
 
     /**
@@ -180,6 +202,38 @@ public class Configuration {
         m_MAIL_ADMIN = mailAdmin;
     }
 
+    /**
+     * Sets the log level of the server log.
+     * For a list of supported loglevels, consider {@link Level}. 
+     * In case of an invalid input, the log level will be left
+     * untouched.
+     * <br></br>
+     * In case of an entirely invalid and config-breaking value,
+     * it is being attempted to repair this part by setting
+     * the level to "INFO".
+     * 
+     * @param logLevel 
+     *            the desired log level
+     */
+    public void setLogLevel(String logLevel) {
+      try {
+        logLevel = logLevel.toUpperCase(Locale.ENGLISH);
+        LOGGER.setLevel(Level.parse(logLevel));
+      }
+      catch (NullPointerException | IllegalArgumentException e) {
+        if (LOGGER.getLevel() != null) {
+          m_LOGLEVEL = LOGGER.getLevel().toString();
+          m_config.setProperty("server/loglevel/@value", m_LOGLEVEL);
+          return;
+        } else {
+          LOGGER.setLevel(Level.parse("INFO"));
+          m_config.setProperty("server/loglevel/@value", "INFO");
+          return;
+        }
+      }
+      m_LOGLEVEL = logLevel;
+    }
+
     // --------------------------- HELP METHODS ---------------------------
 
     /**
@@ -188,7 +242,8 @@ public class Configuration {
     public void loadToMember() {
         /* read mail info from configuration xml */
         m_MAIL_PASSWORD = m_config.getString("email/auth/@password");
-        m_SENDER_MAIL_ADRESS = m_config.getString("email/auth/@adress");
+        m_SENDER_MAIL_ADRESS = m_config.getString("email/auth/@senderAddress");
+        m_MAIL_PORT = m_config.getString("email/auth/@port");
         m_SMTP_HOST = m_config.getString("email/auth/@host");
         /* read admin info from configuration xml */
         m_MAIL_ADMIN = m_config.getString("admin/user/@email");
@@ -196,6 +251,7 @@ public class Configuration {
         m_PASSWORD_ADMIN = m_config.getString("admin/user/@password");
         /* read server info from configuration xml */
         m_SERVER_PORT = m_config.getInt("server/port/@value");
+        setLogLevel(m_config.getString("server/loglevel/@value"));
 
     }
 
@@ -209,6 +265,7 @@ public class Configuration {
         m_config.setProperty("admin/user/@email", m_MAIL_ADMIN);
         m_config.setProperty("admin/user/@name", m_NAME_ADMIN);
         m_config.setProperty("admin/user/@password", m_PASSWORD_ADMIN);
+        m_config.setProperty("server/loglevel/@value", m_LOGLEVEL);
         m_config.save();
     }
 

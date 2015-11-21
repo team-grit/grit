@@ -34,8 +34,8 @@ public class ReportGenerator {
 
     public static void concatenatePdfReports(
             Path folderWithPdfs, Path outPath, String exerciseName,
-            List<Student> studentsWithoutSubmissions) throws IOException {
+            List<Student> studentsWithoutSubmissions, String filename) throws IOException {
         PdfConcatenator.concatPDFS(folderWithPdfs, outPath, exerciseName,
-                studentsWithoutSubmissions);
+                studentsWithoutSubmissions, filename);
     }
 }

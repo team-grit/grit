@@ -1,8 +1,11 @@
+/*
+* changed by Verena Berg on 2015-06-24 at 19.31
+*/
+
 apply plugin: "java"
 apply plugin: 'eclipse'
-apply plugin: 'idea'
 apply plugin: 'application'
-apply plugin: 'sonar-runner'
+apply plugin: 'idea'
 
 group = theGroup
 
@@ -88,8 +91,8 @@ distZip {
         include 'licence/**'
         include 'src/**'
         include 'config/**'
-	include 'runscript.bat'
 	include 'runscript.sh'
+	include 'shutdownGrit.sh'
     }
 }
 
@@ -98,22 +101,10 @@ installApp {
         from '.'
         include 'res/**'
         include 'licence/**'
-        include 'src/**'
         include 'config/**'
-	include 'runscript.bat'
 	include 'runscript.sh'
+	include 'shutdownGrit.sh'
     }
-}
-
-task dockerRebuild(dependsOn: 'installApp') << {
-	exec {
-		executable "cp"
-		args "-rf","build/install/GRIT", "docker/"
-	}
-	exec {
-		executable "docker"
-		args "build", "-t", "teamgrit/grit:extra","."
-	}
 }
 
 uploadArchives {
@@ -124,9 +115,25 @@ uploadArchives {
     }
 }
 
+/*original
+*
+*startScripts {
+*    doLast {
+*    String optionText = 'DEFAULT_JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="' + theDebugPort
+*        unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', optionText)
+*        windowsScript.text = windowsScript.text.replace('DEFAULT_JVM_OPTS=', optionText)
+*    }
+*}
+*/
+
+/* changed
+*
+* tell the Java VM to use IPv4 instead of IPv6
+*/
+
 startScripts {
     doLast {
-    String optionText = 'DEFAULT_JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="' + theDebugPort
+    String optionText = 'DEFAULT_JVM_OPTS="-Djava.net.preferIPv4Stack=true -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="' + theDebugPort
         unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', optionText)
         windowsScript.text = windowsScript.text.replace('DEFAULT_JVM_OPTS=', optionText)
     }

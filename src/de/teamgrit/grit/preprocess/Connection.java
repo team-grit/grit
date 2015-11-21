@@ -17,14 +17,29 @@
 
 package de.teamgrit.grit.preprocess;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
 
 import com.google.gson.annotations.Expose;
 
 import de.teamgrit.grit.preprocess.tokenize.InvalidStructureException;
 import de.teamgrit.grit.preprocess.tokenize.SubmissionStructure;
+import de.teamgrit.grit.util.mailer.EncryptorDecryptor;
 
 /**
  * The connection object stores connection data needed by the Preprocessor.
@@ -38,6 +53,8 @@ import de.teamgrit.grit.preprocess.tokenize.SubmissionStructure;
 public class Connection {
 
     // ------------------------------ FIELDS ------------------------------
+
+    private static final Logger LOGGER = Logger.getLogger("systemlog");
 
     /** The name. */
     @Expose
@@ -53,6 +70,11 @@ public class Connection {
     /* The location of the remote, this is typically an IP address. */
     @Expose
     private String location;
+    
+    /* The protocol of the remote. Only non-blank in case of a Mail
+     * connection */
+    @Expose
+    private String protocol;
 
     /* Login data for password authentication. */
     @Expose
@@ -68,6 +90,10 @@ public class Connection {
     @Expose
     /** The ssh key file. */
     private Path m_sshKeyFile;
+
+    @Expose
+    /** the allowed domain for the mail connection*/
+    private String allowedDomain;
 
     // @Expose
     // /* Exposable variant of the submission structure*/
@@ -94,6 +120,8 @@ public class Connection {
      *            the {@link de.teamgrit.grit.preprocess.ConnectionType} of the remote
      * @param location
      *            the location of the remote (typically a URL)
+     * @param protocol
+     *            the protocol of this location
      * @param username
      *            username for login.
      * @param password
@@ -102,18 +130,23 @@ public class Connection {
      *            username for ssh-login
      * @param keyFileName
      *            name of the secret key file for ssh-login.
+     * @param allowedDomain
+     *            the domain whose emails are seen as submission(s)
      * @throws InvalidStructureException
      *             if the structure is inavlid and needed
      */
     public Connection(int id, String name, ConnectionType connectionType,
-            String location, String username, String password,
-            String sshUsername, String keyFileName, List<String> structureList)
+            String location, String protocol, String username, String password,
+            String sshUsername, String keyFileName, List<String> structureList,
+            String allowedDomain)
             throws InvalidStructureException {
         this.name = name;
         this.connectionType = connectionType;
         this.location = location;
         this.username = username;
         this.password = password;
+        this.protocol = protocol;
+        this.allowedDomain = allowedDomain;
         this.sshUsername = sshUsername;
         if ((keyFileName == null) || "".equals(keyFileName)) {
             m_sshKeyFile = Paths.get("");
@@ -125,6 +158,116 @@ public class Connection {
         this.id = id;
         setStructure(structureList);
     }
+
+    // --------------------- HELPER METHODS ------------------------------
+
+    /**
+     * Checks the associated connection for validity in terms of
+     * connection and whether it can be established.
+     * It does so by performing a dry run on the given connection,
+     * i.e. performing a "list" command for the svn-repository.
+     * <br></br>
+     * All arising exceptions have been summed up to 
+     * {@link CouldNotConnectException}.
+     * @return 
+     *    true in case the check went fine. Otherwise false.
+     * @throws CouldNotConnectException
+     *              In case something went wrong while checking.
+     */
+    public boolean checkConnection() throws CouldNotConnectException {
+      switch (connectionType) {
+        case SVN:
+          LOGGER.info("Testing svn connection to "+location);
+          try {
+                List<String> svnCommand = new LinkedList<>();
+                svnCommand.add("svn");
+                svnCommand.add("ls");
+                svnCommand.add(location);
+                svnCommand.add("--non-interactive");
+                svnCommand.add("--no-auth-cache");
+                svnCommand.add("--depth");
+                svnCommand.add("immediates");
+                svnCommand.add("--username");
+                svnCommand.add(username);
+                svnCommand.add("--password");
+                EncryptorDecryptor ed = new EncryptorDecryptor();
+                svnCommand.add(ed.decrypt(password));
+  
+                Process svnProcess = null;
+                ProcessBuilder svnProcessBuilder = new ProcessBuilder(svnCommand);
+                svnProcessBuilder.directory(new File(System.getProperty("user.dir")));
+  
+                svnProcess = svnProcessBuilder.start();
+                svnProcess.waitFor();
+  
+                if (svnProcess.exitValue() == 0) {
+                  return true;
+                }
+            } catch (InterruptedException e)  {
+              LOGGER.severe("Interrupted while waiting for SVN-Check"
+                  + " to finish.");
+              throw new CouldNotConnectException("SVN-Check got interrupted");
+
+            } catch (InvalidKeyException | NoSuchAlgorithmException
+                | NoSuchPaddingException | IllegalBlockSizeException
+                | BadPaddingException | IOException e) {
+                LOGGER.severe("Could not check "+location+" for working"
+                    + " connection. Reason: "+e.toString());
+                throw new CouldNotConnectException("Reason: "+e.toString());
+             }
+             return false;
+
+        case MAIL:
+          LOGGER.info("Testing mail connection to "+location);
+          Properties props = new Properties(System.getProperties());
+          props.setProperty("mail.store.protocol", protocol);
+          props.setProperty("mail.imap.timeout", "5000");
+          props.setProperty("mail.imap.starttls.enable", "true");
+          props.setProperty("mail.imap.connectiontimeout", "5000");
+          props.setProperty("mail.imaps.timeout", "5000");
+          props.setProperty("mail.imaps.connectiontimeout", "5000");
+          props.setProperty("mail.pop3.timeout", "5000");
+          props.setProperty("mail.pop3.connectiontimeout", "5000");
+
+          // specified mailbox is searched
+          Session session = Session.getInstance(props, null);
+          Store store;
+          try {
+            store = session.getStore();
+            EncryptorDecryptor ed;
+              ed = new EncryptorDecryptor();
+              store.connect(location, username,
+                      ed.decrypt(password));
+              store.close();
+            } catch (InvalidKeyException |
+                NoSuchAlgorithmException |
+                NoSuchPaddingException |
+                IllegalBlockSizeException |
+                BadPaddingException |
+                MessagingException
+                | IOException e) {
+              LOGGER.severe("Could not check "+location+" for working"
+                  + " connection. Reason: "+e.toString());
+              throw new CouldNotConnectException("Reason: "+e.toString());
+          }
+          return true;
+        case ILIAS:
+          LOGGER.info("Testing ilias connection to "+location);
+          return true;
+//          untested! the following code was planned to be used.
+//          String dbConnectionString = "jdbc:mysql://" + location + "/ilias";
+//          SqlConnector sqlConnection = new SqlConnector(dbConnectionString,
+//              username, password);
+//          if (sqlConnection.establishConnection()) {
+//              return true;
+//          }
+//          return false;
+
+      default:
+        return false;
+      }
+    }
+
 
     // --------------------- GETTER / SETTER METHODS ---------------------
 
@@ -158,6 +301,17 @@ public class Connection {
      */
     public void setLocation(String location) {
         this.location = location;
+    }
+    
+    /**
+     * Sets the protocol for this connection.
+     * Only relevant for connections of type 
+     * {@link ConnectionType#MAIL}.
+     * 
+     * @param protocol, the protocol
+     */
+    public void setProtocol(String protocol) {
+      this.protocol = protocol;
     }
 
     /**
@@ -267,6 +421,18 @@ public class Connection {
     }
 
     /**
+     * Gets the protocol of the connection.
+     * Only relevant for connections of type
+     * {@link ConnectionType#MAIL}
+     * 
+     * @return the protocol, if applicable. 
+     * Otherwise <b>null</b>
+     */
+    public String getProtocol() {
+      return protocol;
+    }
+
+    /**
      * Gets the username.
      *
      * @return the username
@@ -303,6 +469,16 @@ public class Connection {
     }
 
     /**
+     * Gets the allowed domain for the mail
+     * connection.
+     * @return 
+     *    the allowed domain, if set by connection. Otherwise null.
+     */
+    public String getAllowedDomain() {
+      return allowedDomain;
+    }
+
+    /**
      * Gets the structure of the remote.
      *
      * @return the structure of the data downloaded by the remote, this might
@@ -311,5 +487,4 @@ public class Connection {
     public SubmissionStructure getStructure() {
         return m_structure;
     }
-
 }

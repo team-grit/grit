@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -63,27 +64,31 @@ public class PdfConcatenator {
      */
     protected static Path concatPDFS(
             Path folderWithPdfs, Path outPath, String exerciseName,
-            List<Student> studentsWithoutSubmissions) throws IOException {
+            List<Student> studentsWithoutSubmissions, String filename) throws IOException {
+      LOGGER.info("Concatenating pdfs for exercise \""
+            +exerciseName+"\" in "+folderWithPdfs.toString());
+      if ((folderWithPdfs == null) || !Files.isDirectory(folderWithPdfs)) {
+        throw new IOException("The Path doesn't point to a Folder");
+      }
 
-        if ((folderWithPdfs == null) || !Files.isDirectory(folderWithPdfs)) {
-            throw new IOException("The Path doesn't point to a Folder");
-        }
+      File file = new File(outPath.toFile(), filename);
 
-        File file = new File(outPath.toFile(), "report.tex");
+      if (Files.exists(file.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+        Files.delete(file.toPath());
+      }
+      file.createNewFile();
 
-        if (Files.exists(file.toPath(), LinkOption.NOFOLLOW_LINKS)) {
-            Files.delete(file.toPath());
-        }
-        file.createNewFile();
+      writePreamble(file, exerciseName);
+      writeMissingStudents(file, studentsWithoutSubmissions);
+      writeUncompilableTexDocuments(file, folderWithPdfs);
+      writeFiles(file, folderWithPdfs);
+      writeClosing(file);
 
-        writePreamble(file, exerciseName);
-        writeMissingStudents(file, studentsWithoutSubmissions);
-        writeFiles(file, folderWithPdfs);
-        writeClosing(file);
+      PdfCreator.createPdfFromPath(file.toPath(), outPath);
+      LOGGER.fine(
+          "Report creation for exercise \""+exerciseName+"\" finished");
 
-        PdfCreator.createPdfFromPath(file.toPath(), outPath);
-
-        return file.toPath();
+      return file.toPath();
 
     }
 
@@ -102,6 +107,7 @@ public class PdfConcatenator {
         FileWriterWithEncoding writer =
                 new FileWriterWithEncoding(file, "UTF-8", true);
 
+        LOGGER.fine("Writing report preamble for " + exerciseName);
         writer.append("\\documentclass[a4paper,10pt,ngerman]{scrartcl} \n");
         writer.append("\\usepackage[ngerman]{babel}\n");
         writer.append("\\usepackage[utf8]{inputenc}");
@@ -110,11 +116,11 @@ public class PdfConcatenator {
         writer.append("\\begin{document} \n");
         writer.append("\\begin{titlepage}\n");
         writer.append("\\begin{center}\n");
-        writer.append("\\textsc{\\LARGE Universität Konstanz}\\\\[1.5cm]\n\n");
+        writer.append("\\textsc{\\LARGE Universit\"at Konstanz}\\\\[1.5cm]\n\n");
         writer.append("{\\large Korrektur\n\n");
         writer.append("\\rule{\\linewidth}{0.5mm}\\\\[0.4cm]\n");
-        writer.append("{\\fontfamily{qhv}\\huge\\bfseries ")
-                .append(exerciseName).append(" \\\\[0.4cm]}\n\n");
+        writer.append("{\\fontfamily{qhv}\\huge\\bfseries \\texttt{\\detokenize{")
+                       .append(exerciseName).append("}}").append(" \\\\[0.4cm]}\n\n");
         writer.append("\\rule{\\linewidth}{0.5mm}\\\\[0.5cm]\n\n");
         writer.append("\\vfill\n");
         writer.append("{\\large\\today\n");
@@ -122,6 +128,7 @@ public class PdfConcatenator {
         writer.append("\\end{titlepage}\n");
 
         writer.close();
+        LOGGER.fine("Writting preamble finished successfully");
     }
 
     /**
@@ -141,18 +148,24 @@ public class PdfConcatenator {
                 new FileWriterWithEncoding(outFile, "UTF-8", true);
 
         File[] files = folderWithPdfs.toFile().listFiles();
+        LOGGER.info("Appending pdfs to final report for "
+            +outFile.getName()+" in "+folderWithPdfs.toString());
         if(files.length > 0){
-        for (File file : files) {
+          for (File file : files) {
+            LOGGER.finer("Processing pdf: "+file.getName());
 
             // We only want the the PDFs as input
             if ("pdf".equals(FilenameUtils.getExtension(file.getName()))) {
                 writer.append("\\includepdf[pages={1-}]{")
                         .append(file.getAbsolutePath()).append("} \n");
-            }
-        } } else {
+                LOGGER.finest("Appending: "+file.getName());
+                }
+          }
+        } else {
             LOGGER.warning("No Reports available in the specified folder: " + folderWithPdfs.toString());
         }
         writer.close();
+        LOGGER.fine("Appending pdfs finished");
     }
 
     /**
@@ -166,16 +179,26 @@ public class PdfConcatenator {
     private static void writeClosing(File file) throws IOException {
         FileWriterWithEncoding writer =
                 new FileWriterWithEncoding(file, "UTF-8", true);
+        LOGGER.fine("Writing closing");
 
         writer.append("\\label{lastpage}");
         writer.append("\\end{document}\n");
 
         writer.close();
+        LOGGER.finer("Writing closing finished.");
     }
 
     /**
-     * Writes the names of the students that didn't hand in a submission.
-     *
+     * Writes the names of the students who didn't hand in a submission
+     * into the report.
+     * 
+     * In case one or more missing submissions are found a separate page
+     * is being created and the acronyms of the students, whose submission
+     * is missing, is appended.
+     * 
+     * They are listed utilizing LaTeX minipages, dividing the list into
+     * two halves and processing each of them sequentially.
+     * 
      * @param file
      *            the file that gets written into.
      * @param studentWithoutSubmissions
@@ -192,8 +215,11 @@ public class PdfConcatenator {
         // .getStudentsWithoutSubmission();
 
         // only write if there are any missing submissions
+        LOGGER.info("Checking for missing submissions");
         if (!(studentWithoutSubmissions == null)
                 && !(studentWithoutSubmissions.isEmpty())) {
+            LOGGER.fine("Missing submissions found. Processing.");
+
             FileWriterWithEncoding writer =
                     new FileWriterWithEncoding(file, "UTF-8", true);
 
@@ -204,20 +230,108 @@ public class PdfConcatenator {
                 writer.append("\\item ")
                         .append(studentWithoutSubmissions.get(i).getName())
                         .append("\n");
+                LOGGER.finest("Appending: "+studentWithoutSubmissions.get(i).getName());
             }
             writer.append("\\end{itemize}\n");
             writer.append("\\end{minipage}");
+            
+            LOGGER.finer("Wrote first half of missing submissions to file.");
 
             writer.append("\\begin{minipage}{.5\\textwidth}\\raggedright\n");
             writer.append("\\begin{itemize}\n");
-            for (int i = 1; i < studentWithoutSubmissions.size(); i += 2) {
+            if (studentWithoutSubmissions.size() > 1) {
+              for (int i = 1; i < studentWithoutSubmissions.size(); i += 2) {
                 writer.append("\\item ")
                         .append(studentWithoutSubmissions.get(i).getName())
                         .append("\n");
+                LOGGER.finest("Appending: "+studentWithoutSubmissions.get(i).getName());
+              }
+            } else {
+              // to prevent empty right handside minipages,
+              // add one extra "hidden" item
+              writer.append("\\item[] ");
             }
             writer.append("\\end{itemize}\n");
-            writer.append("\\end{minipage}\n");
+            writer.append(
+                "\\end{minipage}\n\\\\");
             writer.close();
         }
+        LOGGER.fine("Processing missing submissions finished");
+    }
+
+    /**
+     * This method appends the filenames of non-compiled .tex files 
+     * to the given report. This section is only added in case a 
+     * non-compiling submission-report for a student has been found. 
+     * Otherwise this section is omitted.
+     * <br></br>
+     * The check for compilability is done by checking whether 
+     * the corresponding pdf to each .tex file exists.
+     * 
+     * @param outFile The file to append the results to
+     * @param folderWithPdfs The folder whose content is being checked
+     * @throws IOException in case any I/O errors occur
+     */
+    private static void writeUncompilableTexDocuments(
+        File outFile, Path folderWithPdfs) throws IOException {
+
+      File[] files = folderWithPdfs.toFile().listFiles();
+
+      LOGGER.info("Check for uncompilable .tex-files started");
+      List<File> nonCompilingFiles = new ArrayList<>();
+      for (File file : files) {
+        if ("tex".equals(FilenameUtils.getExtension(file.getName()))) {
+          LOGGER.fine("Processing: "+file.getName());
+          File correspondingPDF = new File(
+            file.getParent()+"/"+file.getName().split("(\\.tex)")[0]+".pdf");
+          if (!correspondingPDF.exists()) {
+            nonCompilingFiles.add(file);
+            LOGGER.finest(
+              "Appending "+file.getName()+" to uncompilable .tex-files.");
+          }
+        }
+      }
+      if (nonCompilingFiles.size() > 0) {
+
+        FileWriterWithEncoding writer =
+            new FileWriterWithEncoding(outFile, "UTF-8", true);
+
+        LOGGER.fine("Uncompilable .tex-Files found! Starting report.");
+
+        writer.append(
+              "\\medskip\\\\\\n"
+            + "{\\LARGE\\bf Tex-Files welche nicht kompilierten:}\\\\\n\\\\");
+        writer.append("\\begin{minipage}{.5\\textwidth}\n");
+        writer.append("\\begin{itemize}\n");
+        for (int i = 0; i < nonCompilingFiles.size(); i += 2) {
+          writer.append("\\item ")
+                  .append(nonCompilingFiles.get(i).getName())
+                  .append("\n");
+          LOGGER.finest("Appending: "+nonCompilingFiles.get(i).getName());
+        }
+      writer.append("\\end{itemize}\n");
+      writer.append("\\end{minipage}");
+
+      LOGGER.finer("Wrote first half of non-compiling .tex files.");
+
+      writer.append("\\begin{minipage}{.5\\textwidth}\\raggedright\n");
+      writer.append("\\begin{itemize}\n");
+      if (nonCompilingFiles.size() > 1) {
+        for (int i = 1; i < nonCompilingFiles.size(); i += 2) {
+          writer.append("\\item ")
+                  .append(nonCompilingFiles.get(i).getName())
+                  .append("\n");
+          LOGGER.finest("Appending: "+nonCompilingFiles.get(i).getName());
+        }
+      } else {
+        // to prevent empty right handside minipages,
+        // add one extra "hidden" item
+        writer.append("\\item[] ");        
+      }
+      writer.append("\\end{itemize}\n");
+      writer.append("\\end{minipage}\n");
+      writer.close();
+      }
+      LOGGER.fine("Processing uncompilable .tex files finished");
     }
 }

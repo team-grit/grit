@@ -128,8 +128,8 @@ public class JavaProjectTester implements Tester {
                     Result runClasses = JUnitCore.runClasses(testerClass);
                     results.add(runClasses);
                 } catch (Throwable e) {
-                    LOGGER.severe("can't load class: " + unitTestName);
-                    LOGGER.severe(e.getMessage());
+                    LOGGER.severe("can't load class: " + unitTestName
+                        + ". Reason: "+e.toString());
                 }
             }
 

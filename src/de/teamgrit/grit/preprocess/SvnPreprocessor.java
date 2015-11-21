@@ -72,8 +72,8 @@ public final class SvnPreprocessor {
     public static PreprocessingResult preprocess(Connection connection,
             Path targetDirectory, String fileRegex, String archiveRegex)
             throws SubmissionFetchingException {
-
-        Tokenizer submissionTokenizer =
+    	    	    	    	
+       Tokenizer submissionTokenizer =
                 new GeneralTokenizer(fileRegex, archiveRegex);
         List<Student> studentsWithoutSubmission = new ArrayList<>();
         Map<Student, Submission> submissions = new HashMap<>();
@@ -82,13 +82,13 @@ public final class SvnPreprocessor {
         // throws SubmissionFetchingException
         Path pathToSubmissions =
                 SvnFetcher.fetchSubmissions(connection, targetDirectory);
-
+       
+        
         if (pathToSubmissions != null) {
             // since we're using SVN we don't receive a list of mail
             // adresses, so we have to parse the corresponding file
             // which has to be provided in the toplevel directory of
             // the repository
-
             LOGGER.info("Collecting submissions");
             try {
                 // getting a list of all submissions with the corresponding
@@ -97,10 +97,10 @@ public final class SvnPreprocessor {
                 List<Submission> tokenizedSubmissions =
                         submissionTokenizer.exploreSubmissionDirectory(
                                 connection.getStructure(), pathToSubmissions);
+                
                 File studentsMapping =
                         new File(pathToSubmissions.toString(), "students.txt");
-
-                // throws FileNotFoundException
+                                
                 Scanner fileReader = new Scanner(studentsMapping);
 
                 List<String> tempStudents = new ArrayList<>();
@@ -117,12 +117,12 @@ public final class SvnPreprocessor {
                 }
 
                 fileReader.close();
-
+                                
                 String[] students = tempStudents.toArray(new String[0]);
 
                 List<Path> emptySubmissionPaths =
                         submissionTokenizer.getEmptySubmissions();
-
+                LOGGER.finer("Mapping student with submission");
                 // map each student in the mapping file to his submission
                 for (String name : students) {
                     String[] mapping = name.split("=");
@@ -134,21 +134,17 @@ public final class SvnPreprocessor {
 
                     // remove all whitespaces in front of the name and the
                     // acronym
-                    while (tempName.startsWith(" ")) {
-                        tempName = tempName.substring(1);
-                    }
-                    while (mapping[0].endsWith(" ")) {
-                        mapping[0] =
-                                mapping[0].substring(0,
-                                        mapping[0].length() - 1);
-                    }
+                    tempName = tempName.trim();
+                    mapping[0] = mapping[0].trim();
+                    
                     // find the submission that belongs to the student by
                     // checking if his acronym is contained in the path
                     for (Submission submission : tokenizedSubmissions) {
                         Student stud = submission.getStudent();
                         String submissionPath =
                                 submission.getSourceCodeLocation().toString();
-                        if (submissionPath.contains(mapping[0])) {
+                        submissionPath = submissionPath.substring(submissionPath.lastIndexOf("/")+1);
+                        if (submissionPath.equals(mapping[0])) {
                             stud.setName(tempName.substring(0,
                                     tempName.indexOf("@")));
                             stud.setEmail(tempName);

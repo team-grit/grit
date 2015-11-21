@@ -1,0 +1,37 @@
+#!/bin/bash
+# The purpose of this script is to collect and address all available scripts for
+# Grit via this one.
+
+# FIXME Currently those scripts are scattered in the grit directory. It
+# would be better to collect them in the same folder. However the pathes 
+# inside those scripts need to be adjusted
+
+option="${1}" 
+case ${option} in 
+   start) 
+     echo "start Grit"
+     cd build/install/GRIT/
+     bash runscript.sh
+     cd ../../..
+      ;; 
+   stop) 
+     echo "shut down Grit"
+     cd build/install/GRIT/
+     bash shutdownGrit.sh
+     cd ../../..
+      ;;
+   restart)  
+      echo "restart Grit"
+      cd build/install/GRIT/
+      bash shutdownGrit.sh
+      bash runscript.sh
+      cd ../../..
+      ;; 
+   update)
+      echo "update Grit"
+      bash update-Grit.sh ${2}
+      ;;
+      "")
+      echo "Please add one of the following options start, stop, restart or update [path to backup folder]"
+      ;;
+esac 

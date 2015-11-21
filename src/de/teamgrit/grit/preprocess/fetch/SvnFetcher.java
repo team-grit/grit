@@ -28,18 +28,25 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import de.teamgrit.grit.preprocess.Connection;
+import de.teamgrit.grit.util.mailer.EncryptorDecryptor;
 
 /**
- * This SVNFetcher is able  to fetch
- * submissions from a SVN repository.
+ * This SVNFetcher is able to fetch submissions from a SVN repository.
+ * It contains submissions, whose names have been cleaned off whitespace,
+ * thus allowing pdftex to compile them easily.
  *
  * @author <a href="mailto:marvin.guelzow@uni-konstanz.de">Marvin Guelzow</a>
  * @author <a href="mailto:eike.heinz@uni-konstanz.de">Eike Heinz</a>
@@ -72,6 +79,7 @@ public final class SvnFetcher {
     public static Path fetchSubmissions(
             final Connection connection, final Path targetDirectory)
             throws SubmissionFetchingException {
+    	
         if (!checkConnectionToRemoteSVN(connection.getLocation())) {
             throw new SubmissionFetchingException(
                     "No connection to remote SVN.");
@@ -214,7 +222,7 @@ public final class SvnFetcher {
             return false;
         }
 
-        LOGGER.config("Checked out, moving internal repository path to "
+        LOGGER.info("Checked out, moving internal repository path to "
                 + targetDirectory.toString());
 
         return true;
@@ -230,19 +238,19 @@ public final class SvnFetcher {
      * @return an updated path
      */
     private static Path updateDirectoryPath(String location, Path oldPath) {
-        Path targetDirectory = Paths.get(oldPath.toAbsolutePath().toString());
+        Path targetDirectory;
         // check whether the svn repo is given via a url or is given via a path
         if (!location.startsWith("file://")) {
-
+          targetDirectory = oldPath;
             // We need to get the name of the checked out folder / repo.
-            int occurences = StringUtils.countMatches(location, "/");
-            int index = StringUtils.ordinalIndexOf(location, "/", occurences);
-            String temp = location.substring(index + 1);
-
+        	String[] locationSplit = location.split("/");
+        	String repoName = locationSplit[locationSplit.length-1];
+        	
             // stitch the last part of the hyperlink to the targetDirectory to
             // receive the structure
-            targetDirectory = Paths.get(targetDirectory.toString(), temp);
+            targetDirectory = Paths.get(targetDirectory.toString(), repoName);
         } else {
+          targetDirectory = Paths.get(oldPath.toAbsolutePath().toString());
             targetDirectory =
                     targetDirectory.resolve(Paths.get(location).getFileName());
         }
@@ -284,7 +292,14 @@ public final class SvnFetcher {
         if ((connection.getPassword() != null)
                 && !connection.getPassword().isEmpty()) {
             svnCommand.add("--password");
-            svnCommand.add(connection.getPassword());
+            EncryptorDecryptor ed = new EncryptorDecryptor();
+            try {
+				svnCommand.add(ed.decrypt(connection.getPassword()));
+			} catch (InvalidKeyException | NoSuchAlgorithmException
+					| NoSuchPaddingException | IllegalBlockSizeException
+					| BadPaddingException e) {
+				LOGGER.severe("Decryption of password for SVN failed. Reason: " + e.getMessage());
+			}
         }
 
         // build process: construct command and set working directory.
@@ -311,7 +326,7 @@ public final class SvnFetcher {
 
         while ((line = svnOutputBuffer.readLine()) != null) {
             svnOutputLines.add(line);
-        }
+        }		
 
         return new SVNResultData(svnProcess.exitValue(), svnOutputLines);
     }

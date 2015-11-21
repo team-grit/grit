@@ -1,0 +1,833 @@
+\documentclass[10pt,a4paper, titlepage, toc=idx]{scrreprt}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{enumitem}
+\usepackage{calrsfs}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{nicefrac}
+\usepackage{stmaryrd}
+\usepackage{wasysym}
+\usepackage{pifont}
+\usepackage{wrapfig}
+
+\usepackage{listings}
+
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+	basicstyle=\footnotesize\ttfamily,        % the size of the fonts that are used for the code
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	captionpos=b,                    % sets the caption-position to bottom
+	commentstyle=\color{mygreen},    % comment style
+	columns=fixed
+	deletekeywords={...},            % if you want to delete keywords from the given language
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	frame=single,                    % adds a frame around the code
+	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue},       % keyword style                 % the language of the code
+	language=bash,
+	morekeywords={*,...},            % if you want to add more keywords to the set
+	numbers=none,                    % where to put the line-numbers; possible values are (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,          % underline spaces within strings only
+	showtabs=false,                  % show tabs within strings adding particular underscores
+	stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+	stringstyle=\color{mymauve},     % string literal style
+	tabsize=2,                       % sets default tabsize to 2 spaces                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+	%	linewidth=80em,
+}
+
+\lstset{prebreak=\raisebox{-1ex}[0ex][0ex]
+	{\ensuremath{\hookleftarrow}}}
+\lstset{postbreak=\raisebox{0ex}[0ex][0ex]
+	{\ensuremath{\hookrightarrow\space}}}
+
+%\usepackage{lastpage}
+\usepackage[svgnames]{xcolor}
+
+%\usepackage{skriptum} % Layout and Design
+% don't change the order of these or \i won't work as it should (I don't see why but that's how it is)
+%\usepackage{cscallr} % Macros
+
+\usepackage[T1]{fontenc}
+
+\usepackage{charter}
+\usepackage[bitstream-charter]{mathdesign} % imo nicer looking math font (fitting to the text font)
+%\usepackage[expert]{mathdesign} % standard math font
+\renewcommand*{\descfont}{\usefont{T1}{qhv}{b}{n}} 
+\usepackage{fancyhdr, hyperref, titlesec, blindtext, color, subfigure}
+
+%\usepackage{sectsty}
+%\chapterfont{\usefont{T1}{bch}{b}{n}\selectfont\huge}
+
+\hypersetup{hidelinks, linktoc=all,}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\fancyhead[L]{\leftmark}
+%\fancyhead[R]{\rightmark}
+\fancyhead[R]{}
+\fancyfoot{}
+%\fancyfoot[L]{\emph{Skriptum Lineare Algebra I}} % name
+\fancyfoot[C]{\thepage}
+%\fancyfoot[R]{\emph{WS 2013/2014}} % semester
+\pagestyle{fancy}
+%headers
+\renewcommand{\chaptermark}[1]{\markboth{\textsc{\chaptername\ \thechapter.\ #1}}{}}
+\renewcommand{\sectionmark}[1]{ \markright{#1}{} }
+
+% TOC
+\usepackage[subfigure]{tocloft} % subfigure option only if using subfigure package
+\renewcommand{\cfttoctitlefont} % ToC title
+{\usefont{T1}{qhv}{b}{n}\selectfont\huge}
+\renewcommand{\cftchapfont} % chapter titles
+{\usefont{T1}{qhv}{b}{n}\selectfont}
+\renewcommand{\cftsecfont} % section titles
+{\usefont{T1}{bch}{m}{n}\selectfont}
+\renewcommand{\cftsubsecfont} % subsection titles
+{\usefont{T1}{bch}{m}{n}\selectfont} 
+\renewcommand{\cftchappagefont} % chapter page numbers
+{\usefont{T1}{bch}{b}{n}\selectfont}
+\renewcommand{\cftsecpagefont} % section page numbers
+{\cftsecfont} 
+\renewcommand{\cftsubsecpagefont} % subsection page numbers
+{\cftsubsecfont}
+
+% chapter
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\fontfamily{qhv}}{\fontfamily{qhv}\bfseries\thechapter\hsp\textcolor{gray75}{$\vert$}\hsp}{0pt}{\Huge\bfseries}
+% section
+\titleformat{\section}[hang]{\Large\bfseries\fontfamily{bch}}{\thesection}{10pt}{\bfseries}
+%subsection
+\titleformat{\subsection}[hang]{\bfseries\fontfamily{bch}}{\thesubsection}{5pt}{\bfseries}
+
+% theorems, not used in the linear algebra I script yet
+\theoremstyle{definition}
+\newtheorem{deff}{Definition}[section]
+\theoremstyle{plain}
+\newtheorem{propp}{Proposition}[section]
+
+% macros
+\renewcommand\over[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+\newcommand*{\product}{Grit}
+\newcommand*{\version}{1.2}
+\newcommand*{\website}{\url{team-grit.com}}
+\newcommand*{\repo}{\url{github.com/team-grit/grit}}
+
+
+\begin{document}
+%	\tikzstyle{every picture}+=[remember picture]
+% \input{title.tex}
+\begin{titlepage}
+  \begin{center}
+			
+    % Upper part of the page. The '~' is needed because \\
+    % only works if a paragraph has started.
+    % \includegraphics[width=0.3\textwidth]{title_pic}~\\[1cm]
+			
+    % \textsc{\LARGE Grit}\\[1.5cm]
+    \includegraphics{pictures/grit}
+			
+    % Title
+    \HRule \\[0.4cm]
+    {\fontfamily{qhv} \huge \bfseries Using the\\\product{} Submission
+      System \\[0.4cm] }
+			
+    \HRule \\[.5cm]
+			
+			
+    {\small Official User Manual for Version \version}\\[1.5cm]
+			
+    \includegraphics[scale=.25]{pictures/1024}
+			
+    % Author and supervisor
+    % \begin{minipage}{0.4\textwidth}
+    %   \begin{flushleft}
+    %   \end{flushleft}
+    % \end{minipage}
+    % \begin{minipage}{0.4\textwidth}
+    %   \begin{flushright}
+    %     \large
+    %     \emph{gelesen von:} \hfill
+    %     Prof. Dr. Markus \textsc{Schweighofer}\\
+    %   \end{flushright}
+    % \end{minipage}
+    % \large
+    % \emph{Autor:} \hfill
+    % Thomas \textsc{Schmidt}
+			
+    \vfill
+			
+    % Bottom of the page
+    % {\large Sommesemester 2014}\\
+    {\large \today}
+			
+  \end{center}
+\end{titlepage}
+\setcounter{tocdepth}{1}
+	
+\setcounter{page}{2} \cleardoublepage
+\tableofcontents
+\chapter{What is \product?}
+%	\product{} offers a comprehensive solution for submission,
+% fetching, evaluating and processing of programming course
+% submissions. All you have to do is to press one button. The
+% server-application constantly keeps an eye on associated
+% repositories, e.g. \textsc{Ilias} and SVN, intelligently fetches
+% student-submitted code and runs predefined tests. In the end, you
+% receive a well-formatted PDF document or a plain-text file
+% containing all the submissions of one assignment ready to print and
+% hand over
+% to your correctors.\\
+%	Furthermore, \product{} lets you create overall statistics on
+% score for one assignment, as well as for entire courses. Thus, it is
+% easy to keep track on how your students perform.
+\product{} is a system, developed by {\sc Team
+  Grit} and improved by {\sc Team Varcid}, that makes the life of lecturers and
+tutors of mainly programming courses easier and more comfortable. With
+\product, we implemented a server-side one-button solution for
+fetching and processing student submissions. This is done in such a
+way that the tutors will not have to worry about not-compiling
+programs and can therefore concentrate on the actually written code
+and its quality. \product{} helps to maximize the teaching quality by
+ruling out unnecessary work and lets the tutors focus on the really
+important matter: Teaching.
+\section{What does \product{} do?}
+With \product, the students do not directly submit their solutions to
+our application. To be precise, they will not even notice that you are
+using \product{} when submitting. Rather, \product{} fetches the student
+submissions from whatever system provided for that purpose. As for
+now, \product{} supports Subversion, and Email submissions,
+however, because of its high modularity, you can easily add your own
+{\it fetcher}. At the end of a previously set deadline,
+\product{} fetches the submissions and processes them. As of now, we
+support Java, C and Haskell submissions, but like {\it fetchers},
+additional modules can be added. After the processing, which includes
+compiling and testing the submission, using previously set unit tests,
+we will put that acquired information about the submission in a
+report, ready for you to download. For now that report will be either
+a PDF or a plain-text file, but, as you will have guessed, other
+formats can be implemented easily.
+\subsection*{What \product{} does not.}
+\product{} does not provide submission features, as it can only import
+submissions. Also, it is not possible to manipulate code in \product,
+because this is not what it was intended for: offline correction on
+paper.  \product{} does not replace a lecturer or tutor by adopting all
+of their correction procedure, however \product{} simplifies their work
+in supporting them with automatable checking routines. So,
+\product{} does not offer any methods to control semantical errors in
+the program code like checking if the summation really does add the
+two summands.  Furthermore \product{} is not suitable to test if the
+submitted solutions of the students actually solves the given problem or
+a part of it. \product{} cannot check any additional exercise
+restrictions specified in the assignment paper (e.g. using inherited
+methods for solving the exercise). \product{} will also not correct any
+programming faults automatically, but will present you the incorrect
+passage, the error, the passed tests as well as compiler
+error message.
+\section{When do you need \product?}
+You are a lecturer/tutor of a general programming course, a java
+workshop, a C++ seminar, ..., in which the participants can or have to
+submit solutions to a given problem. If you are tired of searching for
+syntax errors, compiling errors, typos, etc. for hours at a time, then
+you will definitely appreciate our product to increase the efficiency
+of your correction by prechecking every submitted solution. All in
+all, if you are a university or college professor or lecturer,
+teacher, tutor, or corrector, \product{} can help you automate
+collecting electronically submitted assignments concerning programming
+code from various resources. Compiling tests and predefined tests can
+be run so you can easily focus on the important things.
+
+\subsection*{When you do not need \product.}
+You will not need \product{} if you do not provide electronic submission of
+assignments for your course. Also, \product{} is only suitable for
+fetching programming code assignments, however, other types of
+submissions can be added by oneself.  \product{} does not offer any
+features for students, as it only provides functionalities used by
+teachers and correctors.
+\section{What are the alternatives?}
+\textsc{Team Varcid} has compared \product{} with the following alternatives. You can find it in another document.
+\begin{itemize}
+\item The Marmoset Project \\
+  (\url{marmoset.cs.umd.edu}) \\
+  Marmoset is a system for handling student programming project
+  submission, testing and code review. It has been developed at the
+  University of Maryland for over 5 years. It works in all different
+  programming languages, and is designed to work well with both very
+  small and very large projects, such as our OS course in which a
+  submission consists of tens of thousands of lines of code.
+\item BOSS Online Submission System (Beta phase) \\
+  (\url{sourceforge.net/projects/cobalt}) \\
+  BOSS is a course management tool that allows students to submit
+  assignments on-line in a secure manner. Staff can mark work and run
+  automatic tests on submissions.
+\item Cafe grader \\
+  (\url{gitorious.org/cafe-grader}) \\
+  Cafe grader is a submission and grading system for programming
+  contest and training.  This software was used in APIO'08. It
+  currently has mainly two components: the web submission system and
+  the grader. The web app uses Ruby on Rails; while the grader was
+  written in plain Ruby. Current activity: process of migrating to
+  git, and developing installation scripts.
+\item Praktomat \\
+  (\url{https://github.com/KITPraktomatTeam/Praktomat/})
+  \\
+  Praktomat is a quality control system for programming
+  exercises. Students hand in their submissions directly into
+  Praktomat which then compiles and tests them. It was first developed
+  at the University of Passau in 1998 and was later migrated to the
+  Karlsruhe Institute of Technology in 2008.  The software is written
+  in Python and uses the Django web framework. It is able to manage
+  Java, other programming languages can be added.
+\end{itemize}
+% writing modules yourself or using other software
+\chapter{Getting Help}
+	There are various resources available to get the most out of \product. 
+	\section{Online Documentation}
+	The online version of the documentation is essentially the
+	same as the one you are reading now, however, you will have
+	access to additional resources concerning troubleshooting.
+	But online you will find the newest version.
+	\section{Contact us}
+	Do you have suggestions? Do you miss a feature? Contact {\sc Team Grit} or {\sc team Varcid} by mail. 
+	You will find our mail addresses at the end of the document.
+\chapter{Getting \product}
+If you want to aquire \product, you have to clone the repository from Github.com by
+using the following command:
+\begin{lstlisting}
+	git clone git@gihub.com:team-grit/grit
+\end{lstlisting}
+or using the script "install-GRIT.sh". The script can be found at 
+\begin{lstlisting}
+	http://github.com/team-grit/grit
+\end{lstlisting}
+\textbf{Note:} Both options will clone the complete repository on your computer. \\
+
+\noindent Now you have two options for installation: Either a direct installation on your system or using the virtual machine vagrant. \product\ delivers an initial setup for vagrant. Currently direct installation is only supported on a Linux system. Though it is recommended to use vagrant if you want to install \product\ on Mac or Windows PC. Both ways of installation are explained in section \ref{3.2} and \ref{3.4}, if you want more control during installation you can install \product\ by hand, see section \ref{3.3} for more details. Before you start you should check the following section whether all required software can be installed on your sytem.\\
+
+\noindent \textbf{Note:} These packages will be automatically installed if you use the install-GRIT.sh. described in section \ref{3.2}
+
+
+\section{Required Software}\label{3.1} For installing \product{} you need the current version of the following software.\\
+
+\begin{itemize}
+%\item Java Runtime Environment (jre)
+\item Java Development Kit (\texttt{jdk7} or higher)\\
+		- The package contains the javac compiler, which you need to compile the students' Java submissions
+\item \TeX  live (\texttt{texlive-full})\\
+		- you need Texlive to create your reports
+\item GNU-C-Compiler (\texttt{gcc})\\
+		- to compile the students' C submissions
+\item Glasgow Haskell Compiler (\texttt{ghc})\\
+		- to compile the students' Haskell submissions
+\item Subversion (\texttt{svn})\\
+		- \product{} can fetch submissions from subversion repos, 
+\item Secure Copy (openssh server and client)
+\item G++ Compiler (\texttt{g++})
+\item Git\\
+		- you need Git to get \product.
+\item Gradle\\
+		- you need Gradle to compile the source code of \product
+\end{itemize}
+%For developing you also need the following software. For more information see the developer's manual.
+%\begin{itemize}
+%\item Vagrant (just for virtual machine version)
+%\item VirtualBox (just for virtual machine version)
+%\end{itemize}
+
+\section{Using installation script}\label{3.2}
+\textbf{Warning:} You need a Linux system with the apt-get package to use the script for a direct installation!\\
+
+\noindent Copy the script install-GRIT.sh into any folder you wish to install \product. The required software will be installed by the script! Now you have to run the script.\\
+
+\noindent First you have to make the script executable by the following command:
+\begin{lstlisting}
+	chmod u+x install-GRIT.sh
+\end{lstlisting}
+Now you can run the installation script:
+\begin{lstlisting}
+	./install-GRIT.sh
+\end{lstlisting}
+\product{} should now be installed in a folder ./grit/build/install/GRIT
+relative to the directory where you run the install script.
+
+\section{Direct installation (by hand)}\label{3.3}
+\textbf{Warning:} You need a Linux system to do a direct installation because \product\ uses Unix shell commands.\\
+In this section it is explained how \product\ can be installed step by step using unix commands. However all this commands are used by the install-Grit.sh, though it is recommended to use this script explaind in section \ref{3.2}.\\
+
+\noindent The first step is to install all required files which are listed in \ref{3.1}. Now go into the directory where \product\ should be installed. There you have to generate a git clone in to this location: 
+\begin{lstlisting}
+	git clone git@gihub.com:team-grit/grit
+\end{lstlisting}
+
+\noindent Now there should be a folder called grit. You have to go inside the folder:
+\begin{lstlisting}
+	cd grit
+\end{lstlisting}
+
+\noindent In the next step you have to run gradlew: 
+\begin{lstlisting}
+	./gradlew install
+\end{lstlisting}
+\product{} should now be installed in a folder ./grit/build/install/GRIT
+relative to the directory where you run gradlew install.\\
+
+\noindent \textbf{Note:} ./gradlew install compile the scource code of \product\ and install it by default into the directory ./build/install/GRIT (compare application directory in \ref{3.2} and \ref{3.3})
+
+\section{Installation via Vagrant}\label{3.4}
+We recommend the installation via vagrant only for developers, because it set up a well defined space for \product. However there may be connection issues using a virtual machine, which should be considered using \product\ via a virtual machine.\\
+
+\noindent The following instructions and commands should work with any shell like prompt (e.g. cmd.exe for windows systems).\\
+
+\noindent To install \product\ via vagrant you have to install vagrant first. You can download vagrant here:
+\begin{lstlisting}
+	http://www.vagrantup.com
+\end{lstlisting}
+Follow the instruction for installation of vagrant. Now you have to go into the directory where \product\ should be installed. Then download \product\ via the following command: 
+\begin{lstlisting}
+	git clone git@gihub.com:team-grit/grit
+\end{lstlisting}
+After that run gradlew to compile the scource code
+\begin{lstlisting}
+	gradlew install
+\end{lstlisting}
+And start the virtual machine with this command
+\begin{lstlisting}
+	vagrant up
+\end{lstlisting}
+An ubuntu system will be installed on the virtual machine. Connect to the virtual machine via a ssh client you prefer or use the following command
+\begin{lstlisting}
+	vagrant ssh
+\end{lstlisting}
+
+\noindent On the virtual machine you go into the aplication directory with 
+\begin{lstlisting}
+	cd GRIT
+\end{lstlisting}
+
+%\section{Vagrant VM}
+%TODO !!
+%Für Win7: putty, VirtualBox, Vagrant
+%über cmd: Pfad zu Grit suchen, dann Vagrant up
+%Dann installiert er Ubuntu-files
+%Dann über putty mit SSH-Client auf Vagrant zugreifen (Vagrant gibt einem die ip an)
+%PW: vagrant Nutzername: vagrant
+%Kommandozeile(cmd): gradlew
+%gradlew install
+%Erst dann kann man über Vagrant auf Grit-Ordner zugreifen
+%in putty: cd grit, dann runscript.sh ausführen
+
+
+        \section{Prerequisites}
+
+%\subsection{SSH key permissions}
+ %       Ensure that the virtual machine keyfiles are readable only by
+  %      the current user. Otherwise SSH will refuse to use them. In
+   %     order to set the proper permissions execute the command
+%\begin{lstlisting}
+ %         sudo chmod 0700 -R /res/keyfiles 
+%\end{lstlisting}
+ %       form the \product{} root folder.
+
+        \subsection{SVN repository setup}
+        If you plan to use an SVN repository a "mapping file" must
+        be provided. This file maps the name of the student folders to
+        the student email address. Create a file \texttt{students.txt}
+        in the top level of the repository. This file should contain
+        only blank lines or lines formatted like \texttt{StudentFolder
+          = StudentMail}. Lines beginning with the
+        "\texttt{\#}"-sign will be ignored.
+
+        The file might look like this:
+\begin{lstlisting}
+          # this is a comment
+          stud01 = max.mustermann@test.de
+          stud02 = elsbeth.musterfrau@test.de
+\end{lstlisting}
+
+    
+       
+	\chapter{Running \product}
+	Now after succesfully setting up your system you can finally
+        begin using \product. \product{} runs as a Java application
+        that sets up a web page. All administration and most of the
+        configuration will run over that website. We tried to make
+        your experience as intuitive as possible, but still there
+        might be some ambiguities. For that we put an overview of the
+        whole user interface at the end of this chapter. But first we
+        will guide you through the typical workflow we designed and
+        explain the elements step by step in the order you will most
+        likely encounter them.
+	\section{How to run \product{}}
+	You probably have installed \product{} in a folder structure similar to 
+	./grit/build/install/GRIT. There are several scripts which can be used with \product.
+	Those will be briefly explained.\\
+	
+	\noindent \textbf{Note:} All of them are found in the root directory ./grit. However 
+	during compilation runscript.sh and shutdownGrit.sh are copied into ./grit/build/install/GRIT/.
+	
+\begin{itemize}
+
+\item runscript.sh\\
+		- Starts \product\ and creates a file in the same directory which contains information about the process id of GRIT.
+\item shutdownGrit.sh\\
+		- Stops \product. It looks for a file containing the process id to gently shutdown the process running
+		\product.\\
+		
+		\noindent \textbf{Warning: } If you forgot to stop Grit via this script and your PC has to restart, then
+		the process id is very likely different as in the file created by runscrip.sh. By the following commands 	you can try to find the process id and terminate it by hand.
+\begin{lstlisting}
+		netstat -tulpen | grep 8080
+		kill -15 "process id"
+\end{lstlisting}
+		\item update-Grit.sh\\
+		- Update the current \product\ scource code by fetching and comparing the code from the master tree. Only if the master tree contains different files, \product\ will be updated. The update makes a backup of       		the current working directory, config files and reports. The backup will always be done despite \product\ being up to date. Though it can be used for backup purposes as well. If a path is given like: 
+\begin{lstlisting}
+	./update-Grit.sh example\path\where\backup\is\stored
+\end{lstlisting}
+		the backup folder with the current timestamp will be created at this location, otherwise it will be created in the same folder. The backup folder will not be deleted!\\
+
+\noindent \textbf{Warning: }If \product\ is updated the source code has to recompile. In the process all temp directories such as wdir/, res/web/pdf or config/ will be deleted. The update-Grit tries to ensure via the backup that \product\ goes back into the state before the update by copying the data from the backup folder into the respective folders. However, further testing has to be done to ensure that preupdate and postupdate states are equal.
+
+\item install-GRIT.sh\\
+		- install \product\ see section \ref{3.2} for more information.
+\item gritallinone.sh\\
+		- this script execute all beformentioned script via the following commands. It can be executed in ./grit.
+\begin{lstlisting}
+	./gritallinone start
+\end{lstlisting}
+executes runscript.sh
+\begin{lstlisting}
+	./gritallinone stop
+\end{lstlisting}
+executes shudownGrit.sh
+\begin{lstlisting}
+	./gritallinone update [Path to backup folder]
+\end{lstlisting}
+executes update-Grit.sh Path is optional
+\begin{lstlisting}
+	./gritallinone restart
+\end{lstlisting}
+executes shutdownGrit.sh, then runscript.sh
+\end{itemize}
+	
+\section{How to configure Grit}\label{config}
+    
+Before you start \product\ it is important that you provide the system with all necessary configuration information. Essentially there are two ways you can access the configuration file. The first way is to create a valid fully configured config.xml before booting the system so it can load it while booting. The default config, being created on  first startup, can be found further below.\\
+
+The second way is to configure the system with the edit xml function on the webinterface. You find the Edit XML button in the menu bar. \\
+
+\begin{center}
+   \includegraphics[width=.6\textwidth]{pictures/home.png}
+\end{center}	
+
+The config file contains important data for the server, the mail notification and the admin account. If there is no config present at boot the standard failsafe config will be loaded. This config looks like this:
+		
+\begin{lstlisting}
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config>
+	<server>
+		<port value="8080"/>
+		<loglevel value="INFO"/>
+	</server>
+	<email>
+		<auth host="" port="" senderAddress="" password="" />
+	</email>
+	<admin>
+		<user name="username" email="" password="password"/>
+	</admin>
+</config>
+ \end{lstlisting}
+       	The structure consists of the following items:
+       	\begin{description}
+        \item[<config>:] Wrapper tag which specifies when the config starts and when it ends.
+        \item[<server>:] Holds information about the server. 
+        \item[<port>:] The port the server is running on.
+        \item[<loglevel:>] The level of information which is saved in the log file. The following levels exist Severe, Warning, Info, Finer, Finest, thereby severe provide the least information while Finest provide the most.
+        \item[<email>:] Holds info about the email account where the notification mails are send from.
+        \item[<auth>:] All relevant authentication info for the mail account. The password, the mail address and the SMTP host server(e.g. smtp.gmail.com).
+        \item[<admin>:] Holds info about the admin account.
+        \item[<user>:] The data with which you want to log into the website and the email the admin want to get notifications on.
+		\end{description}
+		
+\noindent \textbf{Information: } \product\ tracks all kind of information during running in the background in a logger file, depending of the log level. The file can be found in the following directory \texttt{./grit/build/install/log/}.\\
+
+\noindent After the configuration was changed the system needs to be rebooted. This will be done automatically in the edit xml function. You should especially consider this if you changed the config file without the edit xml function on the webinterface.
+	
+	\section{First Startup}
+	% TODO HOW TO STARTUP??
+If you are in the ./grit folder you can start \product\ by the following commands 
+
+\begin{lstlisting}
+	./build/install/GRIT/runscript.sh
+	./gritallinone start
+\end{lstlisting}
+
+After booting up, the web page will be available via the {\tt 8080} port of the (virtual) Machine \product\ is running on. You will need to activate Javascript in your browser to properly use the website.  You will see a username and password prompt. The default username is \texttt{username} and the default password is \texttt{password}. \\
+	
+	
+On your first visit of the site you will be presented an empty course overview and the menu bar.
+\begin{center}
+	\includegraphics[width=.6\textwidth]{pictures/home.png}
+\end{center}
+
+Now you can create a course. For that click on the folder with the plus sign.
+	\begin{center}
+          \includegraphics[width=.55\textwidth]{pictures/create_course.png}
+	\end{center}
+	You will be prompted to enter the course name, after that
+        click on {\tt Create course}. The created course will now be
+        visible in the overview.
+	\begin{center}
+          \includegraphics[width=.55\textwidth]{pictures/created_course.png}
+	\end{center}For creating an exercise we will first need to set
+        up a connection so \product{} knows where to get the students'
+        submissions from. For that click on the "gear wheel" symbol in
+        the menu bar. You get now presented the connection overview.
+	\begin{center}
+          \includegraphics[width=.55\textwidth]{pictures/connection_overview.png}
+	\end{center}
+To add a new connection click on the plus sign. You have to add the following information:
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/connection_svn.png}
+\end{center}
+
+	\begin{description}
+        \item[Connection Name:] Name of the connection.
+        \item[Connection Type:] Either SVN or Mail are supported by \product{} \version.
+        \item[Location:] The {\tt url} of the root folder where the
+          submissions will be. The root folder has to contain the \texttt{students.txt}
+        \item[Username:] The name of the SVN account.
+        \item[Password:] The password for the SVN or Mail
+          account.
+        \item[Structure:] The strucure that \product{} will encounter
+          so it knows where to get the submission. For more see
+          Section \ref{structure}.
+	\end{description}
+
+If you want to fetch submissions from an email server you can switch Connection Type to Email. The window will change slightly. Now there are two new fields.
+
+\begin{description}
+        \item[Protocol:] Name of the email protocol used for message retrieval, like pop or imap.
+        \item[Allowed domain:] Email domain whose email should be seen as submissions.
+\end{description}
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/connection_email.png}
+\end{center}
+
+After pressing the {\tt Create Connection} button \product\ automatically checks the correctness of the provided connection. You will see the following window if something was wrong with the input (i.e. connection could not be established).
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/connection_svn_error.png}
+\end{center}
+
+Check the log file for more information, if you encounter this error. If everything works you see the created connection.\\
+
+Go back to the course overview. Either by clicking the "back arrow" or by clicking the \product{} logo.
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/home2.png}
+
+\end{center}
+Click on the course folder to set up the exercise. In the course folder you create a new exerecise by pressing the plus sign.
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/exercise_overview.png}
+\end{center}
+
+The following form will apear.
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/create_exercise.png}
+\end{center}
+
+\begin{description}
+	\item[Exercise Name:] The name of the Exercise that will also be printed on the output document (i.e. Exercise 1/Übung 1).
+	\item[Language:] The programming language for the Exercise. Java, C/C++ and Haskell are supported as of
+ \product{} \version.
+	\item[Start at:] The date the exercise gets handed out to the
+          students.
+	\item[Deadline:] The date when the students must have submitted their submissions.
+	\item[Fetching period:] The time intervall when grit checks for new submissions.
+	\item[Connection to use:] Here you will select the connection, previously created, to be used with the exercise.
+	\item[Unit Test file:] The (optional) file that contains Unit Tests to test for. Only JUnit is supported by \product{}
+          \version.
+	\end{description}
+Please consider that the fetching periods have to fit into the interval between start time and deadline. So if you create an exercise e.g. between 10:00 and 18:00, the fetching period must not be 45 minutes because then the last fetch will be 15 minutes past the deadline. Also you should create the exercise \emph{before} the start time, since otherwise the fetching period will be counted from the creation time.
+
+Now you can click {\tt create exercise} and you will see the created exercise in the overview. 
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/exercise_overview2.png}
+\end{center}
+
+As long as the exercise runs, grit automatically checks for new submissions. This is shown by the status field which changes overtime from waiting, fetching, processing to waiting until the deadline is met. If grit waits until it fetches again, you can download a temporay report file by pressing the yellow button. After the deadline is passed you can download the final report at the same location.
+
+\begin{center}
+	\includegraphics[width=.55\textwidth]{pictures/exercise_overview3.png}
+\end{center}
+
+	\section{Setting up a submission structure}\label{structure}
+In order to be able to correctly match student submission files to students in SVN repositories, \product{} needs to know the structure of the directory tree it is supposed to look at. For this purpose you need to enter a list of regular expressions which match the path \product{} needs to traverse to find submissions. The special tags \texttt{TOPLEVEL} and \texttt{SUBMISSION} indicate the repository root and the submission level respectively.\\
+
+\noindent For example, your repository might have two folders at its root: \texttt{exercise/} and \texttt{lecture/}. While the latter contains no submissions, \texttt{exercise/} contains a folder for each student: \texttt{stud01/}, \texttt{stud02/}, \texttt{stud03/} and so on. Each of these students has a folder for each exercise: \texttt{ex01/}, \texttt{ex02/}, \texttt{ex03/} and so on.\\
+In order to tell \product{} to look in a specific folder (e.g. \texttt{ex01}) you would specify the following list:
+
+\begin{lstlisting}
+	TOPLEVEL
+	exercise
+	stud[0-9][0-9]
+	ex01
+	SUBMISSION
+\end{lstlisting}
+
+\texttt{TOPLEVEL} stands for the root of the repository. Then \product{} will only look at the \texttt{exercise} folder. In there, all folders from \texttt{stud01} upto \texttt{stud99} will be inspected. In each student folder \product{} looks at the folder ex01. From here the system will retrieve the current submission. 
+        	
+\section{Further Information about Email and SVN} \label{dataSourceSpecific} 
+
+\subsection{Email}
+The e-mail sending function for GRIT allows to set up the system so that e-mails will be sent automatically if any number of the following conditions are complied:
+\begin{itemize}
+	\item The file which is delivered by the student is not plausible, i.e the file extension doesn't match with the required one.
+	\item The file which is delivered by the student doesn't compile.
+	\item The subject is invalid
+\end{itemize}
+If the SVN-Submission system is used as Connection-Type e-mails will also be sent automatically if any number of the following conditions are complied:
+\begin{itemize}
+\item The student hasn't committed anything 12 hours before the deadline is expired
+\item The student hasn't committed anything 6 hours before the deadline is expired
+\end{itemize}
+
+If you decided to use email submissions, you already have specified the email address from which \product{} should fetch email submissions. In order for this to work as intended, students have to name the email subject according to the following formula:
+
+       \[ \texttt{[course name-exercise name]} \]
+
+E.g. when the course name is "Course" and the exercise name is "1" (for the first exercise), then the subject should be \texttt{[Course-1]} so \product{} can find the submission(s). Also consider that submissions handed in after the deadline are not imported.
+\subsection{SVN}
+
+For SVN you have to create a different connection for every exercise because the submission structure in the connection specifies which exercise you want to fetch from the repository.\\
+
+
+
+
+      
+        
+%       \subsection{Ilias}
+%       If you create a new course witch will be using an ILIAS connection for an exercise you need to meet some requirements. At first the mapping from \product{} to ILIAS is that courses in \product{} resemble exercises in ILIAS and exercises in \product{} resemble assignments in ILIAS. This is due to the internal database schema of the ILIAS data management. Now you have to make sure that before you create a new course or a new exercise in \product{} this courses and exercises already exist in ILIAS. If not fetching will not work properly. They also need to have exactly the same name. For example:\\\\
+%	    \begin{tabular}{c c | c c}
+%	    GRIT: 				&		& ILIAS:				& \\\hline
+%	    Course: 			&PK1	& Exercise: 			&PK1\\
+%	    Exercises of PK1:	&ex1	& Assignments of PK1:	& ex1\\
+%	    					&ex2	&						& ex2
+%\end{tabular}	 \\\\
+%Furthermore you should ensure that there are no ambiguities in the %name schema of the courses and the exercises so that exercises can be clearly distinguished. For example you should not have two courses with the exact same name.
+  	
+   
+       
+       
+	\chapter{Frequently asked Questions}
+	\begin{enumerate}
+        \item \textit{What does \product{} do?}
+		
+          \product{}  assists you in running a programming course where
+          it is required for students to hand in assignments done in
+          code. The submissions can be automatically fetched from
+          associated repositories and automatically tested. \product{} 
+          delivers a well-structured and comprehensive document ready
+          to be graded by a corrector as well as overall and detailed
+          course statistics.
+		
+        \item \textit{What does \product{} not do?}
+		
+          \product{}  integrates between the steps assignment issuance,
+          submission and correction. To be precise, it fills the
+          formerly manual between submission and correction, as well
+          as everything that comes after correction. \product{} does not
+          provide facilities to issue assignments, submit them, and,
+          certainly cannot correct them.
+		
+        \item \textit{On what type of machine should I install
+            \product?}
+		
+          It is possible to install \product{} on different Linux systems (It is tested on Ubuntu, Debian and OpenSUSE)
+          %with Vagrant on Windows
+		
+        %\item \textit{Do I need a virtual machine for \product?}
+		
+         % You do not need a virtual machine if you use a linux operating system.
+          %Of course you can still use one.\\
+          %If you use an other operating system, you need a VM with a Linux operation system.
+          
+		
+		
+        \item \textit{What is the default username and password?}
+		
+          The default username is {\tt username} and its password is
+          {\tt password}.
+		
+       % \item \textit{What is the {\tt root} password?}
+		
+        %  The {\tt root} password is {\tt root}
+		
+        \item \textit{Should I change the predefined passwords of the
+            provided VM?}
+		
+          Yes.
+		
+%        \item \textit{Is it possible to use a graphical user
+%            interface?}
+%		
+%          If you wish to run \product{} natively or on another virtual
+%          machine, you will find the associated requirements in
+%          \hyperref[4.3]{Section 3 of Chapter 4}.
+		
+	\end{enumerate}
+	\chapter{Credits}
+	\section{Developers Team GRIT}
+	\begin{itemize}[label=]
+        \item Gabriel Einsdorf
+        \item Marvin Gülzow
+        \item Eike Heinz
+        \item Marcel Hiller
+        \item David Kolb
+        \item Fabian Marquart
+        \item Thomas Schmidt
+        \item Stefano Woerner
+	\end{itemize}
+	\section{Developers Team VARCID}
+	\begin{itemize}[label=]
+        \item Verena Berg \hfill (Verena.Berg@uni-konstanz.de)
+        \item Annelie Bruder \hfill (Annelie.Bruder@uni-konstanz.de)
+        \item Robert Schmid \hfill (Robert.Schmid@uni-konstanz.de)
+        \item Cedric Sehrer \hfill (Cedric.Sehrer@uni-konstanz.de)
+        \item Iris Schmidt \hfill (Iris.Schmidt@uni-konstanz.de)
+        \item Dirk Oehler \hfill (Dirk.2.Oehler@uni-konstanz.de)
+        \item Onur Cakmak \hfill (Onur.Cakmak@uni-konstanz.de)
+	\end{itemize}
+	\section{Special Thanks}
+	\begin{itemize}[label=]
+        \item Arno Scharmann
+        \item Dr.-Ing. Ernst de Ridder
+        \item Sigmar Papendick
+        \item Simone Winkler
+        \item Tino Klingebiel
+        \item Stefan Brütsch
+	\end{itemize}
+      \end{document}

@@ -267,6 +267,49 @@ public abstract class EntityHandler extends AbstractHandler {
     }
 
     /**
+     * Parses the given String as a mail protocol and checks for validity.
+     * 
+     * @param parameter
+     * @return the valid mail protocol parsed
+     * @throws BadRequestException
+     *            if mail protocol does not exist or is not supported.
+     */
+    protected String parseProtocol(String parameter) 
+        throws BadRequestException {
+      if (parameter == null) {
+        throw new BadRequestException("The passed protocoll is null");
+      }
+      final String protocol = parameter.trim();
+      if (!(protocol.equals("imap") | protocol.equals("imaps") 
+          | protocol.equals("pop3") | protocol.equals("pop3s"))) {
+        throw new BadRequestException("The passed protocol is invalid.");
+      }
+      return protocol;
+    }
+
+    /**
+     * Parses the given parameter to an allowed domain.
+     * 
+     * @param parameter
+     * @return the allowed domain
+     * @throws BadRequestException
+     *            If the parameter does not represent a valid allowed domain
+     */
+    protected String parseAllowedDomain(String parameter)
+        throws BadRequestException {
+    if (parameter == null) {
+        throw new BadRequestException("The passed allowed domain"
+                + " is null.");
+    }
+    final String name = parameter.trim();
+    if (!name.matches(".+")) {
+        throw new BadRequestException("The passed allowed domain"
+                + " is invalid.");
+    }
+    return name;
+}
+
+    /**
      * Parses a given parameter from a request (or any other string) to a valid
      * date-time ({@link Date}). The parameter has to be formatted like in
      * {@link EntityHandler#DATE_TIME_FORMAT}

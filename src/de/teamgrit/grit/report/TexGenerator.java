@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -43,6 +44,8 @@ import de.teamgrit.grit.preprocess.tokenize.Submission;
  */
 
 class TexGenerator {
+
+    private static final Logger LOGGER = Logger.getLogger("systemlog");
 
     private TexGenerator(){
         // prevent initialisation
@@ -69,6 +72,9 @@ class TexGenerator {
             final String exerciseName) throws IOException {
 
         final File location = outdir.toFile();
+
+        LOGGER.info("Creating .tex file for submission by "+
+            submission.getStudent().getName()+" for course "+courseName);
 
         File file = new File(location, submission.getStudent().getName()
                 + ".report.tex");
@@ -99,11 +105,13 @@ class TexGenerator {
         writeSourceCode(file, submission);
         writeClosing(file);
 
+        LOGGER.finer(file.getName()+" written");
         return file.toPath();
     }
 
     /**
-     * Writes the closing into the TeX file.
+     * Writes the closing of a student's submission into 
+     * the TeX file.
      * 
      * @param file
      *            File the closing gets written into.
@@ -113,12 +121,14 @@ class TexGenerator {
     private static void writeClosing(File file) throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.fine("Writing closing into file");
 
         writer.append("\\end{student}\n");
         writer.append("\\label{lastpage}");
         writer.append("\\end{document}\n");
 
         writer.close();
+        LOGGER.finer("Closing written");
     }
 
     /**
@@ -135,6 +145,7 @@ class TexGenerator {
             throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.fine("Writing compiler errors into file");
 
         writer.append("\\paragraph{Compilerfehler}~\\\\\n");
         writer.append("\\begin{lstlisting}[language=bash, breaklines=true, "
@@ -147,6 +158,7 @@ class TexGenerator {
         writer.append("\\end{lstlisting}\n");
 
         writer.close();
+        LOGGER.finer("Compiler errors written");
     }
 
     /**
@@ -163,6 +175,7 @@ class TexGenerator {
             throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.fine("Writing compiler output into file");
 
         writer.append("\\paragraph{Compilerausgabe}~\\\\\n");
         writer.append("\\color{black}\n");
@@ -183,6 +196,7 @@ class TexGenerator {
         writer.append("\\end{lstlisting}\n");
 
         writer.close();
+        LOGGER.finer("Compiler output written");
     }
 
     /**
@@ -199,6 +213,7 @@ class TexGenerator {
             throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.fine("Writing failed test into file");
         if (submission.getCheckingResult().getTestResults().getDidTest()) {
             writer.append("\\paragraph{Fehlerhafte Tests}~\\\\\n");
             writer.append("\\begin{itemize}\n");
@@ -222,6 +237,7 @@ class TexGenerator {
         }
 
         writer.close();
+        LOGGER.finer("Failed tests written");
     }
 
     /**
@@ -244,15 +260,18 @@ class TexGenerator {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
 
-        writer.append("\\newcommand{\\studycourse}{" + courseName + "}\n");
-        writer.append("\\newcommand{\\assignmentnumber}{" + exerciseName
-                + "}\n");
+        LOGGER.fine("Writting header into file");
+        writer.append("\\newcommand{\\studycourse}{\\texttt{\\detokenize{" + courseName + "}}}\n");
+        writer.append("\\newcommand{\\assignmentnumber}{\\texttt{\\detokenize{" + exerciseName + "}}}\n");
+       // writer.append("\\newcommand{\\studycourse}{" + courseName + "}\n");
+        //writer.append("\\newcommand{\\assignmentnumber}{" + exerciseName + "}\n");
         writer.append("\\begin{document}\n");
 
         writer.append("\\begin{student}{" + submission.getStudent().getName()
                 + "}\n");
 
         writer.close();
+        LOGGER.finer("Header written");
     }
 
     /**
@@ -270,6 +289,8 @@ class TexGenerator {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
 
+        LOGGER.fine("Writing overview into file");
+
         writer.append("\\paragraph{Übersicht}~\\\\\n");
 
         CheckingResult checkingResult = submission.getCheckingResult();
@@ -284,6 +305,7 @@ class TexGenerator {
                 + " Tests bestanden\n");
 
         writer.close();
+        LOGGER.finer("Overview written");
     }
 
     /**
@@ -299,6 +321,7 @@ class TexGenerator {
                 System.getProperty("user.dir"), "res", "tex",
                 "report_preamble.tex").toUri());
 
+        LOGGER.fine("Writing preamble into file");
         String preambleToString = FileUtils.readFileToString(preamble, "UTF-8");
 
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
@@ -307,6 +330,7 @@ class TexGenerator {
         writer.append("\n\n");
 
         writer.close();
+        LOGGER.finer("Preamble written");
     }
 
     /**
@@ -323,6 +347,8 @@ class TexGenerator {
             throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.finer("Writing corresponding source code(s) into file");
+        
 
         writer.append("\\paragraph{Code}~\\\\\n");
 
@@ -350,11 +376,12 @@ class TexGenerator {
             writer.append("\\lstinputlisting[language=" + language);
 
             writer.append(", breaklines=true]{"
-                    + FilenameUtils.separatorsToUnix((f.getAbsolutePath()))
+              + FilenameUtils.separatorsToUnix((f.toString()))
                     + "}\n");
 
         }
         writer.close();
+        LOGGER.finer("Source codes(s) written");
     }
 
     /**
@@ -371,6 +398,7 @@ class TexGenerator {
             throws IOException {
         FileWriterWithEncoding writer = new FileWriterWithEncoding(file,
                 "UTF-8", true);
+        LOGGER.fine("Writing testResults");
         writer.append("\\paragraph{Testergebnis}~\\\\\n");
 
         TestOutput testResults = submission.getCheckingResult()
@@ -396,6 +424,7 @@ class TexGenerator {
             writer.append("Keine Tests vorhanden.\n");
         }
         writer.close();
+        LOGGER.finer("testResults written");
     }
-
+    
 }
