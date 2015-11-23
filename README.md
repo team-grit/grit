@@ -1,5 +1,7 @@
 #GRIT
 
+[![Join the chat at https://gitter.im/team-grit/grit](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/team-grit/grit?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ##How to install:
 *  download source from github: ````git clone git@github.com:team-grit/grit````
 * install vagrant from [here](https://www.vagrantup.com/)
